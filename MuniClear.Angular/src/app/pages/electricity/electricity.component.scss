@@ -1,0 +1,623 @@
+@use '../../../styles/page-shared' as *;
+
+// Color Palette & Variables
+$primary: #0056b3;
+$primary-hover: #004085;
+$bg-light: #f8fafc;
+$surface: #ffffff;
+$text-main: #0f172a;
+$text-muted: #64748b;
+$border-color: #e2e8f0;
+$success: #10b981;
+$error: #ef4444;
+
+// IBT Block Colors (Customizable colors for Block 1, Block 2, etc.)
+$block-colors: (
+  0: #3b82f6, // Block 1
+  1: #f59e0b, // Block 2
+  2: #ef4444  // Block 3
+);
+
+.elec-page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  background-color: $bg-light;
+  color: $text-main;
+  min-height: 100vh;
+  box-sizing: border-box;
+
+  * { box-sizing: border-box; }
+
+  // --- HEADER ---
+  .elec-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    .back-btn {
+      background: transparent;
+      border: 1px solid $border-color;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: $text-main;
+      transition: background 0.2s;
+
+      &:hover { background: #f1f5f9; }
+    }
+
+    .header-info {
+      flex: 1;
+      .header-title { font-size: 1.125rem; font-weight: 700; color: $text-main; }
+      .header-sub { font-size: 0.813rem; color: $text-muted; }
+    }
+
+    .header-icon {
+      color: #f59e0b;
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  // --- REUSABLE UTILITIES ---
+  .section-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 24px 0 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .token-count {
+      background: $border-color;
+      color: $text-main;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+  }
+
+  // Dynamic IBT Block Colors maps
+  @each $index, $color in $block-colors {
+    .block-#{$index} {
+      background-color: rgba($color, 0.1) !important;
+      color: $color !important;
+    }
+    .usage-fill.block-#{$index} {
+      background-color: $color !important;
+    }
+    .tariff-block.block-#{$index} {
+      background-color: $color !important;
+      color: white !important;
+    }
+  }
+
+  // --- HOME STATE ---
+  .usage-card {
+    background: $surface;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid $border-color;
+
+    .usage-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .usage-label { font-size: 0.875rem; color: $text-muted; }
+    .usage-kwh { 
+      font-size: 1.75rem; 
+      font-weight: 700; 
+      span { font-size: 1rem; font-weight: 500; color: $text-muted; }
+    }
+
+    .usage-block-chip {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    .usage-track {
+      height: 8px;
+      background: $border-color;
+      border-radius: 4px;
+      width: 100%;
+      overflow: visible;
+      position: relative;
+      margin-bottom: 6px;
+    }
+
+    .usage-fill {
+      height: 100%;
+      border-radius: 4px;
+      position: relative;
+      transition: width 0.3s ease;
+    }
+
+    .usage-tip {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translate(50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: $surface;
+      border: 3px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .usage-range {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: $text-muted;
+    }
+  }
+
+  .latest-token-card {
+    background: $surface;
+    border: 2px dashed $primary;
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+    position: relative;
+
+    .ltoken-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .ltoken-amount { font-size: 1.25rem; font-weight: 700; }
+    .ltoken-date { font-size: 0.75rem; color: $text-muted; }
+    .ltoken-number {
+      font-family: monospace;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: $primary;
+      margin: 12px 0;
+      word-break: break-all;
+    }
+    .ltoken-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.813rem;
+      color: $text-muted;
+    }
+    .ltoken-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: $primary;
+      font-weight: 500;
+    }
+  }
+
+  .buy-btn {
+    width: 100%;
+    background: $primary;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    box-shadow: 0 4px 6px -1px rgba($primary, 0.15);
+    transition: background 0.2s;
+
+    &:hover { background: $primary-hover; }
+  }
+
+  .token-list {
+    background: $surface;
+    border-radius: 16px;
+    border: 1px solid $border-color;
+    overflow: hidden;
+
+    .token-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid $border-color;
+      transition: background 0.2s;
+
+      &:last-child { border-bottom: none; }
+      &:hover { background: #f8fafc; }
+    }
+
+    .token-row-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .token-row-icon {
+      background: #f1f5f9;
+      color: $text-muted;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .token-row-num { font-family: monospace; font-size: 0.938rem; font-weight: 600; }
+    .token-row-date { font-size: 0.75rem; color: $text-muted; margin-top: 2px; }
+    .token-row-right { display: flex; align-items: center; gap: 8px; }
+    .token-row-amount { font-weight: 600; font-size: 0.938rem; }
+  }
+
+  .tariff-table {
+    background: $surface;
+    border-radius: 16px;
+    border: 1px solid $border-color;
+    padding: 8px;
+
+    .tariff-row {
+      display: grid;
+      grid-template-columns: 36px 1fr 80px 45px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+
+      &.tariff-active {
+        background: #f0fdf4;
+        font-weight: 600;
+      }
+    }
+
+    .tariff-block {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .tariff-rate { text-align: right; }
+    .tariff-curr { color: $success; font-size: 0.813rem; text-align: right; }
+    .tariff-note {
+      font-size: 0.75rem;
+      color: $text-muted;
+      text-align: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed $border-color;
+    }
+  }
+
+  // --- BUY STATE ---
+  .buy-card {
+    background: $surface;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid $border-color;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+    .buy-card-label { font-size: 0.875rem; font-weight: 600; color: $text-muted; margin-bottom: 8px; }
+    
+    .amount-display {
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid $border-color;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      
+      &:focus-within { border-color: $primary; }
+    }
+    
+    .amount-prefix { font-size: 2.25rem; font-weight: 700; color: $text-main; margin-right: 4px; }
+    .amount-input {
+      border: none;
+      background: transparent;
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: $text-main;
+      width: 100%;
+      outline: none;
+      padding: 0;
+
+      &::placeholder { color: #cbd5e1; }
+      /* Hide arrows */
+      &::-webkit-outer-spin-button, &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+      &[type=number] { -moz-appearance: textfield; }
+    }
+
+    .preset-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .preset-btn {
+      background: #f1f5f9;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.813rem;
+      font-weight: 600;
+      color: $text-muted;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover { background: $primary; color: white; }
+    }
+
+    .kwh-estimate {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.813rem;
+      color: $success;
+      background: #f0fdf4;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+  }
+
+  .meter-card {
+    background: $surface;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid $border-color;
+    margin-top: 12px;
+
+    .meter-card-row { display: flex; justify-content: space-between; align-items: center; }
+    .meter-label { font-size: 0.75rem; color: $text-muted; text-transform: uppercase; }
+    .meter-val { font-size: 1.125rem; font-weight: 700; font-family: monospace; margin-top: 2px; }
+
+    // Toggle Switch Styling
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 24px;
+      
+      input { opacity: 0; width: 0; height: 0; }
+    }
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 24px;
+
+      &:before {
+        position: absolute;
+        content: "";
+        height: 18px; width: 18px;
+        left: 3px; bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+      }
+    }
+    input:checked + .switch-slider { background-color: $primary; }
+    input:checked + .switch-slider:before { transform: translateX(16px); }
+    .switch-label { font-size: 0.813rem; font-weight: 500; }
+
+    .other-meter-field {
+      margin-top: 12px;
+      border-top: 1px solid $border-color;
+      padding-top: 12px;
+
+      .meter-input {
+        width: 100%;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 1rem;
+        outline: none;
+        &:focus { border-color: $primary; }
+      }
+    }
+  }
+
+  .stripe-btn {
+    width: 100%;
+    background: #635bff; // Stripe Purple
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) { background: #4f46e5; }
+    &:disabled { background: #cbd5e1; cursor: not-allowed; }
+  }
+
+  .secure-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: $text-muted;
+    margin-top: 10px;
+  }
+
+  // --- SUCCESS STATE ---
+  .success-wrap {
+    text-align: center;
+    padding: 24px 8px;
+
+    .success-circle {
+      width: 72px;
+      height: 72px;
+      background: rgba($success, 0.1);
+      color: $success;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .success-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+    .success-sub { color: $text-muted; font-size: 0.938rem; margin-bottom: 24px; }
+
+    .success-token-card {
+      background: $surface;
+      border: 1px solid $border-color;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      cursor: pointer;
+      margin-bottom: 16px;
+
+      .stoken-label { font-size: 0.75rem; font-weight: 600; color: $text-muted; text-transform: uppercase; }
+      .stoken-number {
+        font-family: monospace;
+        font-size: 1.625rem;
+        font-weight: 700;
+        color: $text-main;
+        letter-spacing: 2px;
+        margin: 12px 0;
+        word-break: break-all;
+      }
+      .stoken-meta { font-size: 0.875rem; color: $text-muted; }
+      .stoken-copy-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: $primary;
+        font-size: 0.813rem;
+        font-weight: 500;
+        margin-top: 12px;
+      }
+    }
+
+    .copy-btn {
+      width: 100%;
+      background: #f1f5f9;
+      color: $text-main;
+      border: 1px solid $border-color;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+      &:hover { background: #e2e8f0; }
+    }
+
+    .done-btn {
+      width: 100%;
+      background: $text-main;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      &:hover { background: #000; }
+    }
+  }
+
+  // --- GLOBAL SPINNERS & MESSAGES ---
+  .error-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba($error, 0.1);
+    color: $error;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 12px;
+  }
+
+  .skeleton-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+    
+    .skeleton-item {
+      height: 74px;
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: loading-shimmer 1.5s infinite;
+      border-radius: 16px;
+    }
+  }
+
+  .token-processing {
+    padding: 24px;
+    text-align: center;
+    color: $text-muted;
+    p { font-weight: 600; color: $text-main; margin: 12px 0 4px; }
+    span { font-size: 0.813rem; }
+  }
+
+  .btn-spinner, .processing-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+  }
+  .processing-spinner {
+    border-color: rgba($primary, 0.2);
+    border-top-color: $primary;
+    width: 32px;
+    height: 32px;
+    margin: 0 auto;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    background: $surface;
+    border-radius: 16px;
+    border: 1px dashed $border-color;
+    
+    .empty-icon { font-size: 1.75rem; margin-bottom: 8px; }
+    p { font-weight: 600; margin: 0 0 4px 0; }
+    span { font-size: 0.813rem; color: $text-muted; }
+  }
+}
+
+// --- ANIMATIONS ---
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes loading-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }

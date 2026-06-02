@@ -1,0 +1,117 @@
+@use '../../../styles/page-shared' as *;
+
+.page-wrap {
+  padding: 1.25rem 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  .back-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    color: #475569;
+
+    &:hover { background: #f1f5f9; color: #0f172a; }
+  }
+  .page-title { font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0; }
+  .page-subtitle { font-size: 0.85rem; color: #64748b; margin: 0; }
+}
+
+.section-label {
+  font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: #475569; margin: 1.75rem 0 0.75rem;
+}
+
+// 🏡 CERTIFIED VALUATION METRIC NOTICE BLOCK
+.valuation-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+
+  .home-icon-frame {
+    width: 54px; height: 54px; border-radius: 12px;
+    background-color: #f3e8ff; color: #7c3aed; // Custom purple identity theme for asset land investments
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .valuation-details {
+    flex: 1;
+    .valuation-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.02em; }
+    .valuation-amount { font-size: 1.6rem; font-weight: 800; color: #0f172a; margin: 0.15rem 0; letter-spacing: -0.02em; }
+    .valuation-subtext { font-size: 0.75rem; color: #94a3b8; margin: 0; }
+  }
+}
+
+// 🏛️ DYNAMIC PRICING SPREAD BREAKDOWN LEDGER CARD
+.card {
+  background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px;
+  overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+
+  .card-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.1rem 1.25rem; border-bottom: 1px solid #f1f5f9;
+    box-sizing: border-box;
+
+    .row-label { font-size: 0.9rem; font-weight: 500; color: #475569; }
+    .row-value { font-size: 0.95rem; font-weight: 700; color: #1e293b; }
+
+    &.reduction-row .row-value { color: #166534; } // Highlights deductions green
+    &.total-highlight-row { border-top: 1px solid #cbd5e1; }
+  }
+}
+
+// 📋 RELIEF UTILITY BUTTON STACKING LAYOUTS
+.action-grid-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+
+  .btn-secondary-utility {
+    width: 100%; background: #ffffff; border: 1px solid #cbd5e1;
+    padding: 1rem 1.25rem; border-radius: 12px; font-weight: 600; font-size: 0.9rem;
+    color: #334155; cursor: pointer; display: flex; align-items: center;
+    justify-content: space-between; transition: all 0.2s ease;
+    box-sizing: border-box;
+
+    svg { color: #94a3b8; transition: transform 0.2s ease; }
+
+    &:hover {
+      background: #f8fafc; border-color: #94a3b8; color: #0f172a;
+      svg { transform: translateX(2px); color: #3b82f6; }
+    }
+  }
+}
+
+.info-banner {
+  background-color: #fef3c7; border: 1px solid #fde047; color: #b45309;
+  border-radius: 12px; padding: 1rem; font-size: 0.825rem; line-height: 1.45;
+  display: flex; align-items: center; gap: 0.6rem; box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .page-wrap { padding: 0.85rem 0.5rem; }
+  .card .card-row { padding: 0.95rem 1rem; }
+  .valuation-card { padding: 1rem; gap: 0.75rem; }
+}

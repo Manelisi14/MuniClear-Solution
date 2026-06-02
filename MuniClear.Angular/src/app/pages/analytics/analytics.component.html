@@ -1,0 +1,63 @@
+<!-- Chart.js — add to index.html if not present:
+     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script> -->
+
+<div class="page-wrap">
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div>
+      <div class="page-title">Usage Analytics</div>
+      <div class="page-subtitle">Electricity & water — last 6 months</div>
+    </div>
+  </div>
+
+  <div class="loading-bar" *ngIf="loading"><div class="loading-inner"></div></div>
+
+  <!-- Electricity stats -->
+  <div class="section-label">Electricity</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total spent</div>
+      <div class="stat-value">{{ formatCurrency(totalSpentElec) }}</div>
+      <div class="stat-sub">last 6 months</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Monthly avg</div>
+      <div class="stat-value">{{ formatCurrency(avgMonthlyElec) }}</div>
+      <div class="stat-sub">per month</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-label">Monthly electricity spend (R)</div>
+    <div class="chart-wrap"><canvas id="elecChart"></canvas></div>
+    <div class="chart-note">
+      <span class="legend-line" style="border-color:#ef4444"></span> Red dashed = IBT block threshold
+    </div>
+  </div>
+
+  <!-- Water stats -->
+  <div class="section-label">Water</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total consumed</div>
+      <div class="stat-value">{{ totalWaterKl.toFixed(1) }} kL</div>
+      <div class="stat-sub">last 6 months</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Monthly avg</div>
+      <div class="stat-value">{{ avgMonthlyWater.toFixed(1) }} kL</div>
+      <div class="stat-sub">per month</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-label">Monthly water consumption (kL)</div>
+    <div class="chart-wrap"><canvas id="waterChart"></canvas></div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && elecData.length === 0 && waterData.length === 0">
+    No usage data yet. Make purchases to see your analytics.
+  </div>
+</div>

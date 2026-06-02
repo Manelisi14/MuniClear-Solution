@@ -1,0 +1,422 @@
+﻿@page "/"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .shell {
+        max-width: 420px;
+        margin: 0 auto;
+        background: #f0f2f5;
+        min-height: 100vh;
+        font-family: 'DM Sans', sans-serif;
+        padding-bottom: 40px;
+    }
+
+    .topbar {
+        background: #fff;
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 0.5px solid #e8e8ec;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .logo-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #0057FF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-text {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0a0a14;
+        letter-spacing: -0.3px;
+    }
+
+    .logo-sub {
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: #0057FF;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #eef2ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 0.5px solid #dde3f5;
+    }
+
+    .greeting-banner {
+        padding: 14px 20px 0;
+    }
+
+    .greeting-text {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #0a0a14;
+    }
+
+    .greeting-sub {
+        font-size: 0.8rem;
+        color: #8a8fa8;
+        margin-top: 2px;
+    }
+
+    .hero {
+        background: linear-gradient(145deg, #0057FF 0%, #1a3fc4 100%);
+        margin: 14px 16px;
+        border-radius: 22px;
+        padding: 24px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+        }
+
+    .hero-acct {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 0.7rem;
+        opacity: 0.5;
+        font-family: 'DM Mono', monospace;
+        letter-spacing: 1px;
+    }
+
+    .hero-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        opacity: 0.75;
+        margin-bottom: 6px;
+    }
+
+    .hero-amount {
+        font-size: 2.8rem;
+        font-weight: 700;
+        letter-spacing: -1.5px;
+        line-height: 1;
+        font-family: 'DM Mono', monospace;
+    }
+
+        .hero-amount span {
+            font-size: 1.4rem;
+            vertical-align: top;
+            margin-top: 6px;
+            display: inline-block;
+            opacity: 0.85;
+        }
+
+    .hero-arrears {
+        font-size: 0.82rem;
+        opacity: 0.8;
+        margin-top: 8px;
+        font-weight: 500;
+    }
+
+        .hero-arrears b {
+            color: #ffcf6b;
+            font-weight: 700;
+        }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 14px;
+        background: rgba(255,255,255,0.15);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #4ade80;
+    }
+
+        .dot.blocked {
+            background: #f87171;
+        }
+
+    .section-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #8a8fa8;
+        padding: 0 20px;
+        margin: 18px 0 10px;
+    }
+
+    .tiles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 0 16px;
+    }
+
+    .tile {
+        background: #fff;
+        border-radius: 18px;
+        padding: 20px 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        cursor: pointer;
+        border: 0.5px solid #ebebf0;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+        .tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+        }
+
+    .tile-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+
+    .tile-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #0a0a14;
+    }
+
+    .tile-desc {
+        font-size: 0.72rem;
+        color: #8a8fa8;
+        margin-top: -6px;
+    }
+
+    .tile-wide {
+        grid-column: span 2;
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 20px;
+    }
+
+    .unblock-tile {
+        background: #0057FF;
+        border-color: #0057FF;
+    }
+
+        .unblock-tile .tile-name {
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .unblock-tile .tile-desc {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .unblock-tile .tile-icon {
+            background: rgba(255,255,255,0.15);
+        }
+
+    .spinner-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px;
+    }
+
+    .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid #e0e4f5;
+        border-top-color: #0057FF;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<div class="shell">
+    <div class="topbar">
+        <div class="logo" @onclick='() => Nav.NavigateTo("/")'>
+            <div class="logo-mark">
+                <i class="bi bi-shield-lock-fill text-white" style="font-size:1.1rem;"></i>
+            </div>
+            <div>
+                <div class="logo-text">MuniClear</div>
+                <div class="logo-sub">@GetGreeting()</div>
+            </div>
+        </div>
+        <div class="avatar" @onclick='() => Nav.NavigateTo("/resident-info")'>
+            <i class="bi bi-person-fill" style="font-size:1.2rem;color:#4f6ef7;"></i>
+        </div>
+    </div>
+
+    @if (account == null)
+    {
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+    }
+    else
+    {
+        <div class="greeting-banner">
+            <div class="greeting-text">Welcome back 👋</div>
+            <div class="greeting-sub">Account @account.accountNumber</div>
+        </div>
+
+        <div class="hero">
+            <div class="hero-acct">•••• @account.accountNumber.Substring(Math.Max(0, account.accountNumber.Length - 4))</div>
+            <div class="hero-label">Current Balance</div>
+            <div class="hero-amount"><span>R</span> @account.currentBalance.ToString("N2")</div>
+            <div class="hero-arrears">Arrears: <b>R @account.arrearsBalance.ToString("N2")</b></div>
+            <div class="status-badge">
+                <div class="dot @(account.isBlocked ? "blocked" : "")"></div>
+                @(account.isBlocked ? "Service Blocked" : "Services Active")
+            </div>
+        </div>
+
+        <div class="section-label">Quick Actions</div>
+        <div class="tiles">
+            <div class="tile" @onclick='() => Nav.NavigateTo("/electricity")'>
+                <div class="tile-icon" style="background:#fff7e6;">
+                    <i class="bi bi-lightning-charge-fill" style="color:#f59e0b;"></i>
+                </div>
+                <div class="tile-name">Electricity</div>
+                <div class="tile-desc">Buy units</div>
+            </div>
+
+            <div class="tile" @onclick='() => Nav.NavigateTo("/buy-airtime")'>
+                <div class="tile-icon" style="background:#eef2ff;">
+                    <i class="bi bi-phone-fill" style="color:#4f6ef7;"></i>
+                </div>
+                <div class="tile-name">Airtime</div>
+                <div class="tile-desc">Top up</div>
+            </div>
+
+            <div class="tile" @onclick='() => Nav.NavigateTo("/water")'>
+                <div class="tile-icon" style="background:#e8f5f0;">
+                    <i class="bi bi-droplet-fill" style="color:#10b981;"></i>
+                </div>
+                <div class="tile-name">Water</div>
+                <div class="tile-desc">Pay bill</div>
+            </div>
+
+            <div class="tile" @onclick='() => Nav.NavigateTo("/statements")'>
+                <div class="tile-icon" style="background:#fdf2f8;">
+                    <i class="bi bi-file-earmark-text-fill" style="color:#a855f7;"></i>
+                </div>
+                <div class="tile-name">Statements</div>
+                <div class="tile-desc">Tax invoices</div>
+            </div>
+
+            @if (account.isBlocked)
+            {
+                <div class="tile tile-wide unblock-tile" @onclick="GoToPayment">
+                    <div class="tile-icon">
+                        <i class="bi bi-credit-card-2-back-fill" style="color:#fff;font-size:1.3rem;"></i>
+                    </div>
+                    <div>
+                        <div class="tile-name">Pay & Unblock Now</div>
+                        <div class="tile-desc">Clear arrears to restore services</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private AccountDTO? account;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load fresh account data from the API every time
+        // this page initializes — including after forceLoad
+        // redirect from PaymentSuccess.razor
+        await LoadAccount();
+    }
+
+    private async Task LoadAccount()
+    {
+        try
+        {
+            // TODO: Replace hardcoded "1" with the logged-in
+            // user's actual AccountId once login is wired up
+            account = await Http.GetFromJsonAsync<AccountDTO>("api/Accounts/1");
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DASHBOARD ERROR] {ex.Message}");
+        }
+    }
+
+    private string GetGreeting()
+    {
+        var h = DateTime.Now.Hour;
+        return h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening";
+    }
+
+    private void GoToPayment() =>
+        Nav.NavigateTo($"/payment/{account?.accountID}/{account?.arrearsBalance}");
+
+    public class AccountDTO
+    {
+        public int accountID { get; set; }
+        public string accountNumber { get; set; } = "";
+        public decimal currentBalance { get; set; }
+        public decimal arrearsBalance { get; set; }
+        public bool isBlocked { get; set; }
+    }
+}

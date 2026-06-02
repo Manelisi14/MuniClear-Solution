@@ -1,0 +1,208 @@
+<div class="elec-page">
+
+  <!-- HEADER -->
+  <header class="elec-header">
+    <button class="back-btn" (click)="step === 'home' ? goBack() : goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <div class="header-info">
+      <div class="header-title">{{ step === 'home' ? 'Electricity' : step === 'buy' ? 'Buy Token' : 'Payment Successful' }}</div>
+      <div class="header-sub">uMhlathuze Municipality</div>
+    </div>
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- ══ HOME ══ -->
+  <ng-container *ngIf="step === 'home'">
+
+    <section class="usage-card">
+      <div class="usage-top">
+        <div>
+          <div class="usage-label">This month's usage</div>
+          <div class="usage-kwh">{{ monthlyKwh.toFixed(1) }} <span>kWh</span></div>
+        </div>
+        <div class="usage-block-chip" [class]="'block-' + currentBlockIndex">
+          {{ currentBlock.label }} · R{{ currentBlock.rateIncl }}/kWh
+        </div>
+      </div>
+      <div class="usage-track">
+        <div class="usage-fill" [class]="'block-' + currentBlockIndex" [style.width.%]="ibtProgressPct">
+          <div class="usage-tip"></div>
+        </div>
+      </div>
+      <div class="usage-range"><span>0 kWh</span><span>600 kWh</span></div>
+    </section>
+
+    <div class="skeleton-list" *ngIf="loading">
+      <div class="skeleton-item" *ngFor="let i of [1,2]"></div>
+    </div>
+
+    <ng-container *ngIf="!loading && latestToken">
+      <div class="section-label">Latest token</div>
+      <section class="latest-token-card" (click)="copyToken(latestToken.token)">
+        <div class="ltoken-top">
+          <div class="ltoken-amount">{{ formatCurrency(latestToken.amount) }}</div>
+          <span class="ltoken-date">{{ formatDate(latestToken.createdAt) }}</span>
+        </div>
+        <div class="ltoken-number">{{ formatToken(latestToken.token) }}</div>
+        <div class="ltoken-footer">
+          <span class="ltoken-meter">{{ latestToken.meterNumber }}</span>
+          <span class="ltoken-copy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Tap to copy
+          </span>
+        </div>
+      </section>
+    </ng-container>
+
+    <button class="buy-btn" (click)="goToBuy()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Buy electricity token
+    </button>
+
+    <ng-container *ngIf="!loading && tokens.length > 0">
+      <div class="section-label" style="margin-top:8px">
+        Token history <span class="token-count">{{ tokens.length }}</span>
+      </div>
+      <section class="token-list">
+        <div class="token-row" *ngFor="let t of tokens" (click)="copyToken(t.token)">
+          <div class="token-row-left">
+            <div class="token-row-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div>
+              <div class="token-row-num">{{ formatToken(t.token) }}</div>
+              <div class="token-row-date">{{ formatDate(t.createdAt) }} · {{ t.meterNumber }}</div>
+            </div>
+          </div>
+          <div class="token-row-right">
+            <div class="token-row-amount">{{ formatCurrency(t.amount) }}</div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color:#64748b"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+
+    <div class="empty-state" *ngIf="!loading && tokens.length === 0">
+      <div class="empty-icon">⚡</div>
+      <p>No tokens yet</p>
+      <span>Buy your first electricity token above</span>
+    </div>
+
+    <div class="section-label" style="margin-top:8px">IBT tariff rates</div>
+    <section class="tariff-table">
+      <div class="tariff-row" *ngFor="let b of ibtBlocks; let i = index" [class.tariff-active]="i === currentBlockIndex">
+        <div class="tariff-block" [class]="'block-' + i">B{{ i + 1 }}</div>
+        <div class="tariff-range">{{ b.range }}</div>
+        <div class="tariff-rate">R{{ b.rateIncl }}/kWh</div>
+        <div class="tariff-curr" *ngIf="i === currentBlockIndex">← You</div>
+        <div *ngIf="i !== currentBlockIndex"></div>
+      </div>
+      <div class="tariff-note">All prices include 15% VAT · 30% arrears diversion on blocked accounts</div>
+    </section>
+
+  </ng-container>
+
+  <!-- ══ BUY ══ -->
+  <ng-container *ngIf="step === 'buy'">
+
+    <section class="buy-card">
+      <div class="buy-card-label">Enter amount</div>
+      <div class="amount-display">
+        <span class="amount-prefix">R</span>
+        <input type="number" class="amount-input" [(ngModel)]="purchaseAmount" min="10" placeholder="0" (input)="error = ''"/>
+      </div>
+      <div class="preset-row">
+        <button class="preset-btn" *ngFor="let p of presetAmounts" (click)="addPreset(p)">+R{{ p }}</button>
+      </div>
+      <div class="kwh-estimate" *ngIf="purchaseAmount >= 10">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        ≈ {{ estimatedKwh.toFixed(1) }} kWh at {{ currentBlock.label }} (R{{ currentBlock.rateIncl }}/kWh)
+      </div>
+    </section>
+
+    <section class="meter-card">
+      <div class="meter-card-row">
+        <div class="meter-info">
+          <div class="meter-label">Meter number</div>
+          <div class="meter-val">{{ buyForSomeoneElse ? (targetMeterNumber || '—') : defaultMeter }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="buyForSomeoneElse"/>
+            <span class="switch-slider"></span>
+          </label>
+          <span class="switch-label">Other meter</span>
+        </div>
+      </div>
+      <div class="other-meter-field" *ngIf="buyForSomeoneElse">
+        <input type="text" [(ngModel)]="targetMeterNumber" placeholder="Enter meter number" class="meter-input" maxlength="15"/>
+      </div>
+    </section>
+
+    <div class="error-banner" *ngIf="error">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ error }}
+    </div>
+
+    <button class="stripe-btn" [disabled]="purchaseAmount < 10 || submitting" (click)="buy()">
+      <ng-container *ngIf="!submitting">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Pay {{ purchaseAmount >= 10 ? formatCurrency(purchaseAmount) : '' }} with Stripe
+      </ng-container>
+      <div class="btn-spinner" *ngIf="submitting"></div>
+    </button>
+
+    <p class="secure-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Secured by Stripe · Token delivered instantly after payment
+    </p>
+
+  </ng-container>
+
+  <!-- ══ SUCCESS ══ -->
+  <ng-container *ngIf="step === 'success'">
+    <div class="success-wrap">
+
+      <div class="success-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="40" height="40">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <div class="success-title">Payment successful!</div>
+      <div class="success-sub">Your electricity token is ready</div>
+
+      <ng-container *ngIf="latestToken; else tokenLoading">
+        <div class="success-token-card" (click)="copyToken(latestToken.token)">
+          <div class="stoken-label">Your token</div>
+          <div class="stoken-number">{{ formatToken(latestToken.token) }}</div>
+          <div class="stoken-meta">{{ formatCurrency(latestToken.amount) }} · {{ latestToken.meterNumber }}</div>
+          <div class="stoken-copy-hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Tap to copy token
+          </div>
+        </div>
+        <button class="copy-btn" (click)="copyToken(latestToken.token)">Copy token to clipboard</button>
+      </ng-container>
+
+      <ng-template #tokenLoading>
+        <div class="token-processing">
+          <div class="processing-spinner"></div>
+          <p>Processing your token…</p>
+          <span>This takes a few seconds</span>
+        </div>
+      </ng-template>
+
+      <button class="done-btn" (click)="goHome()">Done</button>
+    </div>
+  </ng-container>
+
+  <div style="height:40px"></div>
+</div>

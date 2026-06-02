@@ -1,0 +1,193 @@
+<!-- dashboard.component.html -->
+<div class="dash">
+  <!-- ══ HEADER ═══════════════════════════════════════════ -->
+  <header class="dash-header">
+    <div class="header-inner">
+      <button class="avatar-btn" (click)="goToProfile()">
+        <span class="avatar-initials">{{ userInitials }}</span>
+        <div class="avatar-ring"></div>
+      </button>
+      <div class="header-text">
+        <div class="greeting">Good day,</div>
+        <div class="resident-name">{{ userName }}</div>
+      </div>
+      <div class="header-actions">
+        <app-notification-bell></app-notification-bell>
+        <button class="icon-btn" (click)="logout()" aria-label="Logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading Indicator -->
+  <div class="loading-bar" *ngIf="loading">
+    <div class="loading-inner"></div>
+  </div>
+
+  <!-- Error Alert Banner -->
+  <div class="error-banner" *ngIf="error">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    {{ error }}
+  </div>
+
+  <!-- ══ BALANCE CARD ═══════════════════════════════════════ -->
+  <section class="balance-card" *ngIf="account">
+    <div class="balance-card-bg"></div>
+    <div class="balance-card-inner">
+      <div class="card-top-row">
+        <div class="account-label">
+          <span class="account-dot"></span> {{ account.accountNumber }}
+        </div>
+        <div class="status-badge" [class.blocked]="account.isBlocked">
+          {{ account.isBlocked ? 'Blocked' : 'Active' }}
+        </div>
+      </div>
+      <div class="balance-section">
+        <!-- FIXED: Updated terminology tells an accurate financial debt story -->
+        <div class="balance-label">Total amount owing</div>
+        <div class="balance-amount">{{ formatCurrency(account.amountOwing) }}</div>
+      </div>
+      <!-- FIXED: Maps to updated data model variable property name -->
+      <div class="arrears-row" *ngIf="account.overdueAmount > 0">
+        <div class="arrears-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Arrears outstanding
+        </div>
+        <!-- FIXED: Displays updated overdue balance property name mapping value -->
+        <div class="arrears-amount">{{ formatCurrency(account.overdueAmount) }}</div>
+      </div>
+      <button class="pay-btn" (click)="navigate('payment')">
+        <span>Make payment</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ QUICK STATS ═══════════════════════════════════════ -->
+  <section class="stats-row">
+    <div class="stat-card" (click)="navigate('analytics')">
+      <div class="stat-icon elec">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ formatCurrency(totalSpentElec) }}</div>
+        <div class="stat-label">Electricity Spent</div>
+      </div>
+      <svg class="stat-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+    <div class="stat-card" (click)="navigate('water')">
+      <div class="stat-icon water">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ totalWaterUsage.toFixed(1) }} kL</div>
+        <div class="stat-label">Water Usage</div>
+      </div>
+      <svg class="stat-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ ELECTRICITY METER ════════════════════════════════ -->
+  <section class="meter-card">
+    <div class="meter-header">
+      <div class="meter-title">
+        Electricity usage 
+        <span class="live-pill">
+          <span class="live-dot"></span> Live
+        </span>
+      </div>
+      <div class="meter-kwh">{{ monthlyKwh.toFixed(1) }} kWh</div>
+    </div>
+    <div class="meter-track">
+      <div class="meter-fill" [style.width.%]="ibtProgressPct">
+        <div class="meter-glow"></div>
+      </div>
+    </div>
+    <div class="meter-footer">
+      <div class="meter-block-badge">Block {{ currentBlockIndex + 1 }}</div>
+      <div class="meter-range">0 – 600 kWh</div>
+    </div>
+    <div class="meter-blocks">
+      <div class="block-seg" *ngFor="let b of ibtBlocks; let i = index" [class.active]="i === currentBlockIndex">
+        <div class="block-marker"></div>
+        <div class="block-name">{{ b.label }}</div>
+        <div class="block-rate">R{{ b.rateIncl.toFixed(2) }}/kWh</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MUNICIPAL SERVICES GRID ═════════════════════════ -->
+  <div class="section-header">
+    <span class="section-title">Municipal Services</span>
+  </div>
+  <section class="services-grid">
+    <button class="svc-btn" *ngFor="let svc of municipalServices" (click)="navigate(svc.id)">
+      <div class="svc-icon-wrap" [style.background]="svc.bg" [style.border-color]="svc.stroke + '33'">
+        <svg viewBox="0 0 24 24" fill="none" [attr.stroke]="svc.stroke" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+          <rect *ngIf="svc.rect" x="2" y="3" width="20" height="14" rx="2"/>
+          <path *ngIf="svc.path" [attr.d]="svc.path"/>
+        </svg>
+      </div>
+      <span class="svc-label">{{ svc.label }}</span>
+    </button>
+  </section>
+
+  <!-- ══ ACCOUNT & CONVENIENCE GRID ═══════════════════════ -->
+  <div class="section-header">
+    <span class="section-title">Account & Convenience</span>
+  </div>
+  <section class="services-grid">
+    <button class="svc-btn" *ngFor="let svc of convenienceServices" (click)="navigate(svc.id)">
+      <div class="svc-icon-wrap" [style.background]="svc.bg" [style.border-color]="svc.stroke + '33'">
+        <svg viewBox="0 0 24 24" fill="none" [attr.stroke]="svc.stroke" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+          <rect *ngIf="svc.rect" x="2" y="3" width="20" height="14" rx="2"/>
+          <path *ngIf="svc.path" [attr.d]="svc.path"/>
+        </svg>
+      </div>
+      <span class="svc-label">{{ svc.label }}</span>
+    </button>
+  </section>
+
+  <!-- ══ RECENT ACTIVITY ══════════════════════════════════ -->
+  <div class="section-header">
+    <span class="section-title">Recent activity</span>
+    <button class="see-all-btn" (click)="navigate('statement')">See all</button>
+  </div>
+  <section class="activity-list">
+    <div class="tx-row" *ngFor="let tx of transactions">
+      <div class="tx-dot" [class.credit]="tx.credit"></div>
+      <div class="tx-info">
+        <div class="tx-name">{{ tx.description }}</div>
+        <div class="tx-date">{{ formatDate(tx.date) }}</div>
+      </div>
+      <div class="tx-amount" [class.credit]="tx.credit">
+        {{ tx.credit ? '+' : '−' }}{{ formatCurrency(tx.amount) }}
+      </div>
+    </div>
+    <div class="tx-empty" *ngIf="!transactions.length">
+      No recent activity
+    </div>
+  </section>
+  <div class="bottom-spacer"></div>
+</div>

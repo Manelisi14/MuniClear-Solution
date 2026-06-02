@@ -1,0 +1,50 @@
+﻿@page "/payment-success"
+@inject NavigationManager Nav
+
+<div style="min-height: 100vh; background: #f0f2f5; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif;">
+    <div style="background: white; border-radius: 24px; padding: 40px; max-width: 380px; width: 90%; text-align: center; border-top: 6px solid #0057FF;">
+
+        <div style="width: 72px; height: 72px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+            <i class="bi bi-check-lg" style="font-size: 2rem; color: #22c55e;"></i>
+        </div>
+
+        <h2 style="font-weight: 700; color: #0a0a14; margin-bottom: 8px; letter-spacing: -0.5px;">Payment Confirmed!</h2>
+        <p style="color: #8a8fa8; font-size: 0.9rem; margin-bottom: 24px;">Your transaction was processed securely via Stripe.</p>
+
+        <div style="background: #f0f2f5; border-radius: 14px; padding: 16px; margin-bottom: 20px;">
+            <p style="font-size: 0.75rem; color: #8a8fa8; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; margin-bottom: 4px;">Status</p>
+            <p style="font-weight: 700; color: #22c55e; font-size: 1rem; margin: 0;">✓ Verified & Saved</p>
+        </div>
+
+        <p style="color: #8a8fa8; font-size: 0.8rem; margin-bottom: 12px;">
+            Updating your account... redirecting in @countdown seconds
+        </p>
+
+        <div style="height: 4px; background: #e8e8ec; border-radius: 4px; overflow: hidden;">
+            <div style="height: 100%; background: #0057FF; border-radius: 4px; width: @progressWidth%; transition: width 1s linear;"></div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int countdown = 5;
+    private double progressWidth = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Count down 5 seconds with a live progress bar
+        // This gives the Stripe webhook enough time to
+        // update the database before we reload the dashboard
+        for (int i = 5; i >= 0; i--)
+        {
+            countdown = i;
+            progressWidth = ((5 - i) / 5.0) * 100;
+            StateHasChanged();
+
+            if (i == 0) break;
+            await Task.Delay(1000);
+        }
+
+        Nav.NavigateTo("/", forceLoad: true);
+    }
+}

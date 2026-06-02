@@ -1,0 +1,239 @@
+﻿@page "/resident-info"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+@* 1. THE ENGINE (Icons & Animations) *@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com" />
+
+<style>
+    .profile-body {
+        background: #fbfbfd;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding-bottom: 60px;
+    }
+
+    .glass-header {
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 30px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        margin-bottom: 25px;
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .label-text {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #86868b;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: block;
+        letter-spacing: 0.8px;
+    }
+
+    .info-input {
+        width: 100%;
+        padding: 16px;
+        border-radius: 16px;
+        border: 1.5px solid #f2f2f7;
+        background: #f5f5f7;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 20px;
+        outline: none;
+        transition: 0.3s;
+    }
+
+        .info-input:focus {
+            border-color: #0071e3;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
+        }
+
+    .btn-apple {
+        width: 100%;
+        padding: 18px;
+        border-radius: 18px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-save {
+        background: #0071e3;
+        color: white;
+        margin-top: 15px;
+        box-shadow: 0 10px 20px rgba(0,113,227,0.2);
+    }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            background: #0077ed;
+        }
+
+    .btn-logout {
+        background: #fff;
+        color: #ff3b30;
+        border: 2px solid #ff3b3020;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="profile-body">
+    <!-- 2. STICKY HEADER -->
+    <div class="glass-header">
+        <button style="border:none; background:none; cursor:pointer;" @onclick='() => Nav.NavigateTo("/")'>
+            <i class="bi bi-chevron-left" style="font-size: 1.5rem; color: #0071e3;"></i>
+        </button>
+        <span style="font-weight: 800; font-size: 1.2rem; color: #1d1d1f; letter-spacing: -0.5px;">Account Settings</span>
+    </div>
+
+    <div class="container animate__animated animate__fadeIn" style="max-width: 500px; margin: auto; padding: 25px;">
+        @if (resident == null)
+        {
+            <div class="text-center mt-5"><div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div></div>
+        }
+        else
+        {
+            <!-- 3. PERSONAL IDENTITY CARD -->
+            <div class="profile-card">
+                <div class="text-center mb-4">
+                    <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #0071e3 0%, #00c6ff 100%); color: white; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 10px 20px rgba(0,113,227,0.3);">
+                        <i class="bi bi-person-bounding-box" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h3 style="font-weight: 800; margin: 0; color: #1d1d1f;">@resident.FullName</h3>
+                    <p style="font-size: 0.85rem; color: #86868b; margin-top: 5px;">ID: @resident.SA_IDNumber</p>
+                </div>
+
+                <label class="label-text">Contact Information</label>
+                <input type="email" @bind="resident.Email" class="info-input" placeholder="Email Address" />
+                <input type="text" @bind="resident.Phone" class="info-input" placeholder="Phone Number" />
+
+                <label class="label-text">Birth & Origin</label>
+                <div style="display: flex; gap: 12px;">
+                    <input type="text" value="1992-05-14" readonly class="info-input" style="flex: 1.5;" />
+                    <input type="text" value="RSA 🇿🇦" readonly class="info-input" style="flex: 1;" />
+                </div>
+
+                <label class="label-text">Residential Address</label>
+                <input type="text" value="Block 7, Meerensee, Richards Bay" readonly class="info-input" />
+
+                <button class="btn-apple btn-save" @onclick="UpdateProfile" disabled="@isBusy">
+                    @if (isBusy)
+                    {
+                        <span class="spinner-border spinner-border-sm"></span> <span>Syncing...</span>
+                    }
+                    else
+                    {
+                        <span>Update My Details</span>
+                    }
+                </button>
+                @if (!string.IsNullOrEmpty(statusMsg))
+                {
+                    <p class="text-center text-success small mt-3 animate__animated animate__fadeIn">✓ @statusMsg</p>
+                }
+            </div>
+
+            <!-- 4. PROTECTED SECURITY SECTION -->
+            <div class="profile-card">
+                <label class="label-text">Security & Password</label>
+                <div style="position: relative;">
+                    <input type="password" value="********" readonly class="info-input" style="background: #fcfcfd; border-color: #eee; color: #aeaeb2;" />
+                    <i class="bi bi-shield-lock-fill" style="position: absolute; right: 20px; top: 18px; color: #0071e3;"></i>
+                </div>
+
+                @if (!showPassEdit)
+                {
+                    <button class="btn btn-link p-0 fw-bold text-decoration-none" style="font-size: 0.85rem; color: #0071e3;" @onclick="() => showPassEdit = true">
+                        Change Security Credentials?
+                    </button>
+                }
+                else
+                {
+                    <div class="animate__animated animate__fadeIn">
+                        <input type="password" @bind="newPass" class="info-input" placeholder="New Secure Password" style="border-color: #0071e3;" />
+                        <input type="password" @bind="confirmPass" class="info-input" placeholder="Confirm New Password" style="border-color: #0071e3;" />
+
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-apple btn-save" style="margin:0;" @onclick="UpdatePassword">Update</button>
+                            <button class="btn-apple" style="background:#f5f5f7; color:#1d1d1f;" @onclick="() => showPassEdit = false">Cancel</button>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- 5. LOGOUT BUTTON -->
+            <button class="btn-apple btn-logout shadow-sm" @onclick='() => Nav.NavigateTo("/login")'>
+                <i class="bi bi-box-arrow-right me-2"></i> Sign Out of MuniClear
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    private ResidentData? resident;
+    private bool isBusy = false;
+    private bool showPassEdit = false;
+    private string newPass = "";
+    private string confirmPass = "";
+    private string statusMsg = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            resident = await Http.GetFromJsonAsync<ResidentData>("api/Residents/1");
+        }
+        catch (Exception ex) { Console.WriteLine(ex.Message); }
+    }
+
+    private async Task UpdateProfile()
+    {
+        if (resident == null) return;
+        isBusy = true;
+        // Logic to PUT to your Residents API
+        await Http.PutAsJsonAsync($"api/Residents/{resident.ResidentID}", resident);
+        statusMsg = "Profile updated in muni.db";
+        isBusy = false;
+    }
+
+    private async Task UpdatePassword()
+    {
+        if (newPass != confirmPass || string.IsNullOrEmpty(newPass)) { statusMsg = "Passwords mismatch!"; return; }
+        isBusy = true;
+        resident.PasswordHash = newPass;
+        await Http.PutAsJsonAsync($"api/Residents/{resident.ResidentID}", resident);
+        statusMsg = "Password updated successfully";
+        showPassEdit = false;
+        newPass = ""; confirmPass = "";
+        isBusy = false;
+    }
+
+    public class ResidentData
+    {
+        public int ResidentID { get; set; }
+        public string SA_IDNumber { get; set; } = "";
+        public string FullName { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string PasswordHash { get; set; } = "";
+    }
+}

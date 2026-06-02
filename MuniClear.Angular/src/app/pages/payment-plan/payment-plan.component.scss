@@ -1,0 +1,163 @@
+@use '../../../styles/page-shared' as *;
+
+.account-rescue-theme {
+  padding: 1.25rem 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #0b0f19; // Ultra premium dark mode background swap for financial tracking high contrast
+  min-height: 100vh;
+  color: #f8fafc;
+  box-sizing: border-box;
+
+  .page-header .back-btn {
+    background: #1e293b; border-color: #334155; color: #cbd5e1;
+    &:hover { background: #334155; color: #ffffff; }
+  }
+  .page-header .header-titles .page-title { color: #ffffff; }
+  .page-header .header-titles .page-subtitle { color: #94a3b8; }
+  .section-label { color: #94a3b8; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; }
+}
+
+// 🛡️ CRITICAL RESTRICTION ALERT SHIELD BOX
+.critical-alert-shield {
+  background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; border-radius: 20px;
+  padding: 1.25rem; display: flex; align-items: center; gap: 1.15rem; margin-bottom: 1.5rem;
+  box-sizing: border-box;
+
+  .shield-icon-wrap {
+    width: 56px; height: 56px; border-radius: 16px; background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; justify-content: center; color: #94a3b8; flex-shrink: 0;
+  }
+
+  .shield-text-meta {
+    .shield-headline { font-size: 1.05rem; font-weight: 700; margin: 0; color: #ffffff; }
+    .shield-desc { font-size: 0.825rem; color: #94a3b8; margin: 0.25rem 0 0; line-height: 1.4; }
+  }
+
+  &.is-restricted {
+    border-color: rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(220,38,38,0.08) 0%, transparent 100%);
+    .shield-icon-wrap { background: rgba(239,68,68,0.15); color: #f87171; animation: blink 2s infinite ease-in-out; }
+    .shield-text-meta .shield-headline { color: #fca5a5; }
+  }
+}
+
+// 🎚️ THE TACTILE FREEDOM SLIDER RUNNER
+.tactile-term-selector-box {
+  background: #1e293b; border: 1px solid #334155; border-radius: 20px;
+  padding: 1.5rem; margin-bottom: 1.5rem; box-sizing: border-box;
+  
+  .premium-freedom-slider {
+    -webkit-appearance: none; width: 100%; height: 8px; border-radius: 9999px;
+    background: #334155; outline: none; margin: 1rem 0;
+    
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%;
+      background: #3b82f6; border: 4px solid #ffffff; cursor: pointer;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); transition: transform 0.1s ease;
+      &:hover { transform: scale(1.15); }
+    }
+  }
+
+  .slider-ticks-labels {
+    display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; font-weight: 600;
+    span.active { color: #3b82f6; }
+  }
+
+  .active-badge-display {
+    display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem;
+    .months-counter-headline { font-size: 1.4rem; font-weight: 800; color: #ffffff; }
+    
+    .interest-rate-tag {
+      font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.65rem; border-radius: 8px; text-transform: uppercase;
+      &.tier-favourable { background: rgba(16,185,129,0.15); color: #34d399; }
+      &.tier-moderate { background: rgba(245,158,11,0.15); color: #fbbf24; }
+      &.tier-extended { background: rgba(239,68,68,0.15); color: #f87171; }
+    }
+  }
+}
+
+// 🔮 NEON GLOWING PREVIEW BREAKDOWN CARD LAYOUTS
+.glowing-preview-card {
+  background: #111827; border: 1px solid #334155; border-radius: 20px;
+  padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; box-sizing: border-box;
+  transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .preview-inner-row {
+    display: flex; justify-content: space-between; align-items: center;
+    .preview-label { font-size: 0.85rem; color: #94a3b8; font-weight: 500; }
+    .instalment-highlight { font-size: 1.8rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+  }
+
+  .preview-divider-line { height: 1px; background: #223147; margin: 1rem 0; }
+
+  .preview-sub-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    .sub-label { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
+    .sub-value { font-size: 0.95rem; font-weight: 700; color: #cbd5e1; margin-top: 0.15rem; display: block; }
+  }
+
+  // Neon light trace updates matching selector color mappings
+  &.tier-favourable { border-color: rgba(16,185,129,0.4); box-shadow: 0 0 20px rgba(16,185,129,0.05); .instalment-highlight { color: #34d399; } }
+  &.tier-moderate { border-color: rgba(245,158,11,0.4); box-shadow: 0 0 20px rgba(245,158,11,0.05); .instalment-highlight { color: #fbbf24; } }
+  &.tier-extended { border-color: rgba(239,68,68,0.4); box-shadow: 0 0 20px rgba(239,68,68,0.05); .instalment-highlight { color: #f87171; } }
+}
+
+// 🟢 RUNNING ARRANGEMENT TIMELINE JOURNEY MAP VIEWS
+.rescue-mission-track {
+  background: #1e293b; border: 1px solid #334155; border-radius: 24px; padding: 1.5rem;
+  box-sizing: border-box; margin-bottom: 1.5rem; text-align: center;
+
+  .glowing-status-badge {
+    display: inline-flex; font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 20px; margin-bottom: 1.5rem;
+    &.running { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  }
+
+  .progress-dial-zone {
+    margin: 1rem 0 2rem;
+    .percentage-headline { font-size: 2.75rem; font-weight: 900; color: #ffffff; display: block; letter-spacing: -0.03em; }
+    .sub-label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+    
+    .milestone-track-line {
+      height: 6px; background: #334155; border-radius: 9999px; margin-top: 1rem; overflow: hidden;
+      .milestone-fill-glow { height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); border-radius: 9999px; box-shadow: 0 0 10px #3b82f6; }
+    }
+  }
+
+  .metrics-dashboard-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; border-top: 1px solid #334155; padding-top: 1.25rem;
+    .mini-metric-tile {
+      text-align: left;
+      .tile-title { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
+      .tile-amount { font-size: 1.15rem; font-weight: 800; display: block; margin-top: 0.2rem; }
+      .charge-paid { color: #34d399; }
+      .charge-owed { color: #f87171; }
+    }
+  }
+}
+
+.reward-streak-banner {
+  background: rgba(245,158,11,0.06); border: 1px dashed rgba(245,158,11,0.3); border-radius: 14px;
+  padding: 1rem; display: flex; align-items: center; gap: 0.85rem; margin-top: 1.25rem; text-align: left;
+  .medal-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .reward-text { font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; strong { color: #fbbf24; } }
+}
+
+// 🚀 DISPATCH SUBMIT ACTION RESCUE BUTTON
+.btn-action-rescue-dispatch {
+  width: 100%; background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; border: none;
+  padding: 1.1rem; border-radius: 16px; font-weight: 700; font-size: 1rem; margin-top: 1.5rem;
+  cursor: pointer; box-shadow: 0 4px 15px rgba(37,99,235,0.3); transition: all 0.2s ease;
+  box-sizing: border-box;
+  
+  &:hover:not(:disabled) { background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); transform: translateY(-1px); }
+  &:disabled { background: #334155; color: #64748b; cursor: not-allowed; box-shadow: none; }
+}
+
+.alert-banner {
+  padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.85rem; font-weight: 600; margin-top: 1rem;
+  &.error { background: rgba(239,68,68,0.15); color: #f87171; }
+  &.success { background: rgba(16,185,129,0.15); color: #34d399; }
+}
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+.bottom-spacer-padding { height: 3rem; }

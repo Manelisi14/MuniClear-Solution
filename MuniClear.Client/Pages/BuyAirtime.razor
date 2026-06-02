@@ -1,0 +1,566 @@
+﻿@page "/buy-airtime"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .shell {
+        max-width: 420px;
+        margin: 0 auto;
+        background: #f0f2f5;
+        min-height: 100vh;
+        font-family: 'DM Sans', sans-serif;
+        padding-bottom: 40px;
+    }
+
+    .topbar {
+        background: #fff;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border-bottom: 0.5px solid #e8e8ec;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .back-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #f0f2f5;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+        .back-btn:hover {
+            background: #e4e6ea;
+        }
+
+    .page-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0a0a14;
+        letter-spacing: -0.3px;
+    }
+
+    .card-section {
+        background: #fff;
+        margin: 16px;
+        border-radius: 20px;
+        padding: 20px;
+        border: 0.5px solid #ebebf0;
+    }
+
+    .section-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #8a8fa8;
+        margin-bottom: 12px;
+    }
+
+    .networks {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 4px;
+    }
+
+    .network-btn {
+        border-radius: 14px;
+        padding: 12px 6px;
+        text-align: center;
+        cursor: pointer;
+        border: 2px solid #ebebf0;
+        background: #fff;
+        transition: all 0.15s;
+    }
+
+        .network-btn.active {
+            border-color: currentColor;
+            transform: scale(1.05);
+        }
+
+        .network-btn .net-name {
+            font-size: 0.6rem;
+            font-weight: 800;
+            color: #0a0a14;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+    .network-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin: 0 auto;
+    }
+
+    .input-wrap {
+        position: relative;
+    }
+
+        .input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8a8fa8;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+    .styled-input {
+        width: 100%;
+        padding: 13px 14px 13px 40px;
+        border-radius: 13px;
+        border: 1.5px solid #ebebf0;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: 'DM Mono', monospace;
+        color: #0a0a14;
+        background: #fafafa;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+        .styled-input:focus {
+            border-color: #0057FF;
+            background: #fff;
+        }
+
+    .amount-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .amt-btn {
+        padding: 16px 8px;
+        border-radius: 14px;
+        border: 1.5px solid #ebebf0;
+        background: #fafafa;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0a0a14;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-family: 'DM Sans', sans-serif;
+    }
+
+        .amt-btn.active {
+            background: #0057FF;
+            border-color: #0057FF;
+            color: #fff;
+        }
+
+        .amt-btn:hover:not(.active) {
+            border-color: #0057FF;
+            color: #0057FF;
+        }
+
+    .custom-amount-wrap {
+        position: relative;
+        margin-top: 4px;
+    }
+
+        .custom-amount-wrap span {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 700;
+            color: #8a8fa8;
+            font-family: 'DM Mono', monospace;
+        }
+
+    .custom-input {
+        width: 100%;
+        padding: 13px 14px 13px 30px;
+        border-radius: 13px;
+        border: 1.5px solid #ebebf0;
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: 'DM Mono', monospace;
+        color: #0a0a14;
+        background: #fafafa;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+        .custom-input:focus {
+            border-color: #0057FF;
+            background: #fff;
+        }
+
+        .custom-input.active-custom {
+            border-color: #0057FF;
+            background: #f0f4ff;
+        }
+
+    .purchase-btn {
+        width: 100%;
+        padding: 16px;
+        border-radius: 16px;
+        border: none;
+        background: #0057FF;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+        transition: opacity 0.15s, transform 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+        .purchase-btn:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .purchase-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+    .secure-note {
+        text-align: center;
+        font-size: 0.72rem;
+        color: #8a8fa8;
+        margin-top: 12px;
+    }
+
+    .history-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 0.5px solid #f0f2f5;
+    }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+    .history-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .history-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: #eef2ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .history-network {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #0a0a14;
+    }
+
+    .history-number {
+        font-size: 0.75rem;
+        color: #8a8fa8;
+        margin-top: 1px;
+        font-family: 'DM Mono', monospace;
+    }
+
+    .history-amount {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0057FF;
+        font-family: 'DM Mono', monospace;
+    }
+
+    .history-date {
+        font-size: 0.7rem;
+        color: #b0b4c4;
+        margin-top: 1px;
+        text-align: right;
+    }
+
+    .error-msg {
+        background: #fff1f0;
+        border: 1px solid #ffd6d6;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        color: #e53e3e;
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2.5px solid rgba(255,255,255,0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<div class="shell">
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <button class="back-btn" @onclick='() => Nav.NavigateTo("/")'>
+            <i class="bi bi-chevron-left" style="color:#0057FF;font-size:1rem;"></i>
+        </button>
+        <div class="page-title">Buy Airtime</div>
+    </div>
+
+    <!-- NETWORK SELECTION -->
+    <div class="card-section">
+        <div class="section-label">Select Network</div>
+        <div class="networks">
+            @foreach (var net in Networks)
+            {
+                <div class="network-btn @(SelectedNetwork == net ? "active" : "")"
+                     style="color:@GetNetworkColor(net);"
+                @onclick="() => SelectNetwork(net)">
+                    <div class="net-name">@net</div>
+                    <div class="network-dot" style="background:@GetNetworkColor(net);"></div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- PHONE NUMBER -->
+    <div class="card-section">
+        <div class="section-label">Recipient Number</div>
+        <div class="input-wrap">
+            <i class="bi bi-phone-fill"></i>
+            <input class="styled-input" type="tel" placeholder="081 234 5678"
+                   maxlength="10"
+            @bind="PhoneNumber" @bind:event="oninput" />
+        </div>
+    </div>
+
+    <!-- AMOUNT -->
+    <div class="card-section">
+        <div class="section-label">Select Amount</div>
+        <div class="amount-grid">
+            @foreach (var amt in Amounts)
+            {
+                <button class="amt-btn @(SelectedAmount == amt && !UseCustomAmount ? "active" : "")"
+                @onclick="() => SelectPreset(amt)">
+                    R @amt
+                </button>
+            }
+        </div>
+
+        <!-- CUSTOM AMOUNT INPUT -->
+        <div class="custom-amount-wrap">
+            <span>R</span>
+            <input class="custom-input @(UseCustomAmount ? "active-custom" : "")"
+                   type="number" min="5" max="1000"
+                   placeholder="Enter custom amount"
+            @bind="CustomAmountText"
+            @bind:event="oninput"
+            @onfocus="() => UseCustomAmount = true" />
+        </div>
+    </div>
+
+    <!-- PURCHASE BUTTON -->
+    <div style="padding: 0 16px;">
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="error-msg">
+                <i class="bi bi-exclamation-circle me-1"></i> @ErrorMessage
+            </div>
+        }
+
+        <button class="purchase-btn" @onclick="ProcessPurchase" disabled="@IsProcessing">
+            @if (IsProcessing)
+            {
+                <div class="spinner"></div>
+                <span>Processing...</span>
+            }
+            else
+            {
+                <i class="bi bi-lightning-charge-fill"></i>
+                <span>Purchase R @GetFinalAmount().ToString("N0") Airtime</span>
+            }
+        </button>
+
+        <div class="secure-note">
+            <i class="bi bi-shield-lock-fill"></i> Secured by Stripe
+        </div>
+    </div>
+
+    <!-- PURCHASE HISTORY -->
+    <div class="card-section" style="margin-top: 20px;">
+        <div class="section-label">Recent Purchases</div>
+
+        @if (History.Count == 0)
+        {
+            <div style="text-align:center; padding: 20px 0; color: #8a8fa8; font-size: 0.85rem;">
+                No purchases yet
+            </div>
+        }
+        else
+        {
+            @foreach (var h in History)
+            {
+                <div class="history-item">
+                    <div class="history-left">
+                        <div class="history-icon">
+                            <i class="bi bi-phone-fill" style="color:#4f6ef7;"></i>
+                        </div>
+                        <div>
+                            <div class="history-network">@h.Network Airtime</div>
+                            <div class="history-number">@h.PhoneNumber</div>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="history-amount">R @h.Amount.ToString("N0")</div>
+                        <div class="history-date">@h.Date.ToString("dd MMM HH:mm")</div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private string PhoneNumber = "";
+    private string SelectedNetwork = "Vodacom";
+    private int SelectedAmount = 20;
+    private string CustomAmountText = "";
+    private bool UseCustomAmount = false;
+    private bool IsProcessing = false;
+    private string ErrorMessage = "";
+
+    private string[] Networks = { "Vodacom", "MTN", "Cell C", "Telkom" };
+    private int[] Amounts = { 10, 20, 50, 100, 200, 500 };
+
+    // Purchase history — loaded from API
+    private List<PurchaseHistory> History = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadHistory();
+    }
+
+    private async Task LoadHistory()
+    {
+        try
+        {
+            // Load recent airtime purchases for account 1
+            // TODO: replace hardcoded 1 with logged-in AccountId
+            var purchases = await Http.GetFromJsonAsync<List<PurchaseHistory>>(
+                "api/MobilePurchases?t=" + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+
+            if (purchases != null)
+                History = purchases.OrderByDescending(p => p.Date).Take(5).ToList();
+        }
+        catch
+        {
+            // History is optional — silently fail if endpoint isn't ready
+        }
+    }
+
+    private void SelectNetwork(string net)
+    {
+        SelectedNetwork = net;
+    }
+
+    private void SelectPreset(int amt)
+    {
+        SelectedAmount = amt;
+        UseCustomAmount = false;
+        CustomAmountText = "";
+    }
+
+    private decimal GetFinalAmount()
+    {
+        if (UseCustomAmount && decimal.TryParse(CustomAmountText, out var custom) && custom > 0)
+            return custom;
+        return SelectedAmount;
+    }
+
+    private string GetNetworkColor(string network) => network switch
+    {
+        "Vodacom" => "#e60000",
+        "MTN" => "#f5a623",
+        "Cell C" => "#333333",
+        "Telkom" => "#0099ff",
+        _ => "#0057FF"
+    };
+
+    private async Task ProcessPurchase()
+    {
+        ErrorMessage = "";
+
+        // Validate phone number
+        if (string.IsNullOrWhiteSpace(PhoneNumber) || PhoneNumber.Length < 10)
+        {
+            ErrorMessage = "Please enter a valid 10-digit phone number.";
+            return;
+        }
+
+        // Validate amount
+        var amount = GetFinalAmount();
+        if (amount < 5)
+        {
+            ErrorMessage = "Minimum purchase amount is R5.";
+            return;
+        }
+        if (amount > 1000)
+        {
+            ErrorMessage = "Maximum purchase amount is R1000.";
+            return;
+        }
+
+        IsProcessing = true;
+
+        // Small delay for UX feel then go straight to Stripe
+        await Task.Delay(600);
+
+        // Navigate to payment page with AccountId=1 and the amount
+        // PaymentMethod metadata will be set to "Airtime" in the controller
+        Nav.NavigateTo($"/payment/1/{amount}");
+    }
+
+    // Local model for history display
+    public class PurchaseHistory
+    {
+        public string Network { get; set; } = "";
+        public string PhoneNumber { get; set; } = "";
+        public decimal Amount { get; set; }
+        public DateTime Date { get; set; }
+    }
+}

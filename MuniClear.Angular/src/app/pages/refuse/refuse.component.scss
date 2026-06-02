@@ -1,0 +1,127 @@
+@use '../../../styles/page-shared' as *;
+
+.page-wrap {
+  padding: 1.25rem 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  .back-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    color: #475569;
+
+    &:hover { background: #f1f5f9; color: #0f172a; }
+  }
+  .page-title { font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0; }
+  .page-subtitle { font-size: 0.85rem; color: #64748b; margin: 0; }
+}
+
+.section-label {
+  font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: #475569; margin: 1.75rem 0 0.75rem;
+}
+
+// 🚚 LIVE COLLECTION NOTICE BOX
+.collection-status-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+
+  .truck-icon-frame {
+    width: 54px; height: 54px; border-radius: 12px;
+    background-color: #f0fdf4; color: #166534; // Waste services default signature green palette
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .status-details {
+    flex: 1;
+    .status-alert-title { font-size: 1.05rem; font-weight: 700; color: #0f172a; }
+    .status-alert-desc { font-size: 0.825rem; color: #64748b; margin: 0.2rem 0 0; line-height: 1.4; }
+  }
+
+  // Active status color transformer changes dynamically when tracking collection day match bounds
+  &.collection-today {
+    border-color: #22c55e;
+    background-color: #f0fdf4;
+    .truck-icon-frame { background-color: #22c55e; color: #ffffff; }
+    .status-details .status-alert-title { color: #14532d; }
+  }
+}
+
+// 🏛️ BILLING SUMMARY SECTION CARD
+.card {
+  background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px;
+  overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+
+  .card-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.1rem 1.25rem; border-bottom: 1px solid #f1f5f9;
+    box-sizing: border-box;
+
+    .row-label { font-size: 0.9rem; font-weight: 500; color: #475569; }
+    .row-value { font-size: 0.95rem; font-weight: 700; color: #1e293b; }
+
+    &.total-highlight-row { border-top: 1px solid #cbd5e1; }
+  }
+}
+
+// 🚨 COMPLAINTS DISPATCH MENU BUTTONS GRID SYSTEM
+.action-flex-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+
+  .action-btn-tile {
+    background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
+    padding: 1.25rem 1rem; display: flex; flex-direction: column; align-items: center;
+    gap: 0.75rem; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+
+    .tile-icon-wrapper {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    
+    .btn-danger-wrap { background-color: #fee2e2; color: #b91c1c; }
+    .btn-warning-wrap { background-color: #fef3c7; color: #d97706; }
+    
+    .tile-label { font-size: 0.8rem; font-weight: 700; color: #334155; text-align: center; }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+      
+      &.alert-btn { border-color: #fca5a5; }
+      &.warning-btn { border-color: #fde047; }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .page-wrap { padding: 0.85rem 0.5rem; }
+  .action-flex-grid { gap: 0.5rem; }
+}

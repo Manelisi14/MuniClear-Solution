@@ -1,0 +1,722 @@
+<div class="admin-wrap" [class.sidebar-collapsed]="sidebarCollapsed">
+
+  <!-- ══ SIDEBAR ═══════════════════════════════════════════════ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">MuniClear</div>
+        <div class="brand-sub">Admin Portal</div>
+      </div>
+      <button class="collapse-btn" (click)="sidebarCollapsed = !sidebarCollapsed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="admin-info">
+      <div class="admin-avatar">{{ (userName || 'A')[0] }}</div>
+      <div class="admin-meta">
+        <div class="admin-name">{{ userName }}</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+      <div class="admin-status-dot"></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Overview</div>
+      <button *ngFor="let item of NAV.slice(0,2)" class="nav-item"
+              [class.active]="activeModule === item.id"
+              (click)="setModule(item.id)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path [attr.d]="item.icon"/>
+        </svg>
+        <span class="nav-label">{{ item.label }}</span>
+        <span class="nav-badge" *ngIf="item.id === 'faults' && stats?.pendingFaults">{{ stats.pendingFaults }}</span>
+      </button>
+
+      <div class="nav-group-label">Operations</div>
+      <button *ngFor="let item of NAV.slice(2,6)" class="nav-item"
+              [class.active]="activeModule === item.id"
+              (click)="setModule(item.id)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path [attr.d]="item.icon"/>
+        </svg>
+        <span class="nav-label">{{ item.label }}</span>
+      </button>
+
+      <div class="nav-group-label">Management</div>
+      <button *ngFor="let item of NAV.slice(6)" class="nav-item"
+              [class.active]="activeModule === item.id"
+              (click)="setModule(item.id)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path [attr.d]="item.icon"/>
+        </svg>
+        <span class="nav-label">{{ item.label }}</span>
+      </button>
+    </nav>
+
+    <button class="sidebar-logout" (click)="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      <span>Sign out</span>
+    </button>
+
+  </aside>
+
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <main class="admin-main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" (click)="sidebarCollapsed = !sidebarCollapsed">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div class="page-breadcrumb">
+          <span class="breadcrumb-root">Admin</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-current">{{ NAV | activeLabel:activeModule }}</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" placeholder="Search anything…" [(ngModel)]="residentSearch" (keyup.enter)="loadResidents()"/>
+        </div>
+        <app-notification-bell></app-notification-bell>
+      </div>
+    </header>
+
+    <!-- Feedback -->
+    <div class="feedback-bar success" *ngIf="success">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+      {{ success }}
+      <button (click)="success = ''">×</button>
+    </div>
+    <div class="feedback-bar error" *ngIf="error">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ error }}
+      <button (click)="error = ''">×</button>
+    </div>
+
+    <div class="content-area">
+
+      <!-- ══ DASHBOARD MODULE ═══════════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'dashboard'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Operations Dashboard</h1>
+            <p class="module-sub">uMhlathuze Local Municipality — Real-time overview</p>
+          </div>
+          <div class="module-actions">
+            <button class="btn-outline" (click)="loadStats()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.08-8.36"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid" *ngIf="stats">
+          <div class="kpi-card">
+            <div class="kpi-icon residents">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value">{{ stats.totalResidents }}</div>
+              <div class="kpi-label">Total residents</div>
+            </div>
+            <div class="kpi-trend up">+12%</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon revenue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value">{{ formatCurrency(stats.monthlyRevenue) }}</div>
+              <div class="kpi-label">Monthly revenue</div>
+            </div>
+            <div class="kpi-trend up">+8.4%</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon arrears">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value">{{ formatCurrency(stats.totalArrears) }}</div>
+              <div class="kpi-label">Total arrears</div>
+            </div>
+            <div class="kpi-trend down">{{ stats.blockedAccounts }} blocked</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon faults">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value">{{ stats.pendingFaults }}</div>
+              <div class="kpi-label">Pending faults</div>
+            </div>
+            <div class="kpi-trend" [class.down]="stats.pendingFaults > 5">{{ stats.totalFaults }} total</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon collection">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value">{{ stats.collectionRate }}%</div>
+              <div class="kpi-label">Collection rate</div>
+            </div>
+            <div class="kpi-trend up">On target</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon plans">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-value">{{ stats.activePlans }}</div>
+              <div class="kpi-label">Active pay plans</div>
+            </div>
+            <div class="kpi-trend up">Active</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="dash-charts">
+          <div class="chart-card wide">
+            <div class="chart-header">
+              <div class="chart-title">Revenue trend</div>
+              <div class="chart-sub">Last 6 months</div>
+            </div>
+            <div class="chart-body">
+              <canvas id="revenueChart" height="200"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Faults by category</div>
+            </div>
+            <div class="chart-body">
+              <canvas id="faultChart" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom tables -->
+        <div class="dash-tables">
+
+          <!-- Recent payments -->
+          <div class="table-card">
+            <div class="table-card-header">
+              <span>Recent payments</span>
+              <button class="link-btn" (click)="setModule('payments')">View all →</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Account</th><th>Amount</th><th>Method</th><th>Date</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let p of stats?.recentPayments">
+                  <td>#{{ p.accountID }}</td>
+                  <td class="amount-cell">{{ formatCurrency(p.amount) }}</td>
+                  <td><span class="method-badge">{{ p.paymentMethod }}</span></td>
+                  <td class="muted">{{ formatDate(p.createdAt) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Top arrears -->
+          <div class="table-card">
+            <div class="table-card-header">
+              <span>Top arrears</span>
+              <button class="link-btn" (click)="setModule('residents')">Manage →</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Account</th><th>Arrears</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr *ngFor="let a of stats?.topArrears">
+                  <td class="mono">{{ a.accountNumber }}</td>
+                  <td class="amount-cell danger">{{ formatCurrency(a.arrearsBalance) }}</td>
+                  <td><span class="status-pill" [class.blocked]="a.isBlocked">{{ a.isBlocked ? 'Blocked' : 'Active' }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <!-- ══ RESIDENTS MODULE ══════════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'residents'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Resident Management</h1>
+            <p class="module-sub">View profiles, manage access and account status</p>
+          </div>
+          <div class="module-actions">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" placeholder="Search name, email, ID…" [(ngModel)]="residentSearch"/>
+              <button class="btn-primary sm" (click)="loadResidents()">Search</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="block-reason-bar">
+          <label>Block/unblock reason:</label>
+          <input type="text" [(ngModel)]="blockReason" placeholder="Non-payment, policy violation…"/>
+        </div>
+
+        <div class="residents-grid">
+          <div class="resident-card" *ngFor="let r of residents">
+            <div class="res-header">
+              <div class="res-avatar">{{ r.fullName?.[0] }}</div>
+              <div class="res-info">
+                <div class="res-name">{{ r.fullName }}</div>
+                <div class="res-email">{{ r.email }}</div>
+              </div>
+              <span class="status-pill sm" [class.blocked]="r.account?.isBlocked">
+                {{ r.account?.isBlocked ? 'Blocked' : 'Active' }}
+              </span>
+            </div>
+            <div class="res-details">
+              <div class="res-detail-row">
+                <span class="detail-label">SA ID</span>
+                <span class="detail-val mono">{{ r.idMasked }}</span>
+              </div>
+              <div class="res-detail-row">
+                <span class="detail-label">Phone</span>
+                <span class="detail-val">{{ r.phone || '—' }}</span>
+              </div>
+              <div class="res-detail-row">
+                <span class="detail-label">Account</span>
+                <span class="detail-val mono">{{ r.account?.accountNumber || '—' }}</span>
+              </div>
+              <div class="res-detail-row">
+                <span class="detail-label">Balance</span>
+                <span class="detail-val" [class.danger-text]="r.account?.currentBalance < 0">
+                  {{ r.account ? formatCurrency(r.account.currentBalance) : '—' }}
+                </span>
+              </div>
+              <div class="res-detail-row">
+                <span class="detail-label">Arrears</span>
+                <span class="detail-val danger-text" *ngIf="r.account?.arrearsBalance > 0">
+                  {{ formatCurrency(r.account.arrearsBalance) }}
+                </span>
+                <span class="detail-val ok-text" *ngIf="!r.account?.arrearsBalance">None</span>
+              </div>
+            </div>
+            <div class="res-actions">
+              <button class="btn-outline sm danger" *ngIf="!r.account?.isBlocked" (click)="toggleBlock(r)">Block account</button>
+              <button class="btn-outline sm ok" *ngIf="r.account?.isBlocked" (click)="toggleBlock(r)">Unblock</button>
+            </div>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <!-- ══ BILLING MODULE ════════════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'billing'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Billing Management</h1>
+            <p class="module-sub">Generate invoices and manage municipal charges</p>
+          </div>
+        </div>
+
+        <div class="billing-layout">
+
+          <div class="billing-form card-panel">
+            <div class="panel-title">Generate new bill</div>
+
+            <div class="form-row">
+              <label>Account ID</label>
+              <input type="number" [(ngModel)]="newBill.accountId" min="1"/>
+            </div>
+            <div class="form-row">
+              <label>Water charge (excl. VAT)</label>
+              <div class="input-prefix">
+                <span>R</span>
+                <input type="number" [(ngModel)]="newBill.waterCharge" min="0" step="0.01"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Electricity charge (excl. VAT)</label>
+              <div class="input-prefix">
+                <span>R</span>
+                <input type="number" [(ngModel)]="newBill.electricityCharge" min="0" step="0.01"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Refuse (default R185.50)</label>
+              <div class="input-prefix">
+                <span>R</span>
+                <input type="number" [(ngModel)]="newBill.refuseCharge" min="0" step="0.01"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Sewer charge (excl. VAT)</label>
+              <div class="input-prefix">
+                <span>R</span>
+                <input type="number" [(ngModel)]="newBill.sewerCharge" min="0" step="0.01"/>
+              </div>
+            </div>
+
+            <div class="bill-total-row">
+              <span>Total incl. 15% VAT</span>
+              <span class="bill-total-amount">{{ formatCurrency(newBillTotal) }}</span>
+            </div>
+
+            <button class="btn-primary full" (click)="generateBill()">Generate & notify resident</button>
+          </div>
+
+          <div class="billing-table card-panel">
+            <div class="panel-title">Recent bills</div>
+            <table class="data-table">
+              <thead>
+                <tr><th>Bill ID</th><th>Account</th><th>Period</th><th>Total</th><th>Date</th></tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let b of allBills | slice:0:20">
+                  <td class="mono muted">#{{ b.billID }}</td>
+                  <td>#{{ b.accountID }}</td>
+                  <td>{{ b.billingMonth }}</td>
+                  <td class="amount-cell">{{ formatCurrency(b.totalAmount) }}</td>
+                  <td class="muted">{{ formatDate(b.createdAt) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <!-- ══ PAYMENTS MODULE ═══════════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'payments'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Payment Audit</h1>
+            <p class="module-sub">Review transactions and verify payments</p>
+          </div>
+          <div class="module-actions">
+            <input type="date" [(ngModel)]="paymentsFrom" class="date-input"/>
+            <span class="date-sep">to</span>
+            <input type="date" [(ngModel)]="paymentsTo" class="date-input"/>
+            <button class="btn-outline" (click)="loadPayments()">Filter</button>
+            <button class="btn-primary" (click)="exportCsv()">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="data-table-wrap card-panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Account</th><th>Amount</th><th>Method</th>
+                <th>Date</th><th>Verified</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of payments">
+                <td class="mono muted">#{{ p.paymentID }}</td>
+                <td>#{{ p.accountID }}</td>
+                <td class="amount-cell">{{ formatCurrency(p.amount) }}</td>
+                <td><span class="method-badge">{{ p.paymentMethod }}</span></td>
+                <td class="muted">{{ formatDate(p.createdAt) }}</td>
+                <td>
+                  <span class="verified-badge" [class.yes]="p.isVerified">
+                    {{ p.isVerified ? '✓ Verified' : 'Pending' }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-outline sm" *ngIf="!p.isVerified" (click)="verifyPayment(p.paymentID)">Verify</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </ng-container>
+
+      <!-- ══ FAULTS MODULE ═════════════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'faults'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Fault Management</h1>
+            <p class="module-sub">Real-time infrastructure fault tracking and assignment</p>
+          </div>
+          <div class="module-actions">
+            <select [(ngModel)]="faultStatusFilter" (change)="loadFaults()" class="select-input">
+              <option value="">All statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+            <select [(ngModel)]="faultCategoryFilter" (change)="loadFaults()" class="select-input">
+              <option value="">All categories</option>
+              <option value="Water">Water</option>
+              <option value="Electricity">Electricity</option>
+              <option value="Roads">Roads</option>
+              <option value="Sanitation">Sanitation</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="faults-layout">
+
+          <div id="admin-fault-map" class="fault-map-panel"></div>
+
+          <div class="faults-list card-panel">
+            <div class="faults-list-inner">
+              <div class="fault-item" *ngFor="let f of allFaults">
+                <div class="fault-dot" [style.background]="STATUS_COLOR[f.status]"></div>
+                <div class="fault-body">
+                  <div class="fault-ref">{{ f.reference }}</div>
+                  <div class="fault-cat">{{ f.category }} — {{ f.description | slice:0:50 }}…</div>
+                  <div class="fault-meta">{{ formatDate(f.createdAt) }}</div>
+                </div>
+                <div class="fault-actions">
+                  <span class="status-pill sm" [style.background]="STATUS_COLOR[f.status] + '22'" [style.color]="STATUS_COLOR[f.status]">
+                    {{ f.status }}
+                  </span>
+                </div>
+              </div>
+              <div class="empty-state" *ngIf="!allFaults.length">No faults found</div>
+            </div>
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <!-- ══ ANALYTICS MODULE ══════════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'analytics'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Analytics & Reporting</h1>
+            <p class="module-sub">Performance metrics, adoption rates and export reports</p>
+          </div>
+          <div class="module-actions">
+            <button class="btn-primary" (click)="exportCsv()">Export report</button>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="chart-card full">
+            <div class="chart-header">
+              <div class="chart-title">Revenue collection — last 6 months</div>
+            </div>
+            <div class="chart-body tall">
+              <canvas id="revenueChart" height="260"></canvas>
+            </div>
+          </div>
+
+          <div class="analytics-kpis">
+            <div class="mini-kpi">
+              <div class="mini-kpi-val">{{ stats?.totalResidents || 0 }}</div>
+              <div class="mini-kpi-label">Registered citizens</div>
+            </div>
+            <div class="mini-kpi">
+              <div class="mini-kpi-val">{{ stats?.collectionRate || 0 }}%</div>
+              <div class="mini-kpi-label">Collection rate</div>
+            </div>
+            <div class="mini-kpi">
+              <div class="mini-kpi-val">{{ stats?.resolvedFaults || 0 }}</div>
+              <div class="mini-kpi-label">Faults resolved</div>
+            </div>
+            <div class="mini-kpi">
+              <div class="mini-kpi-val">{{ stats?.activePlans || 0 }}</div>
+              <div class="mini-kpi-label">Active pay plans</div>
+            </div>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <!-- ══ NOTIFICATIONS MODULE ══════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'notify'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Broadcast Notifications</h1>
+            <p class="module-sub">Send push notifications and SMS alerts to all residents</p>
+          </div>
+        </div>
+
+        <div class="notify-layout">
+
+          <div class="notify-form card-panel">
+            <div class="panel-title">Compose broadcast</div>
+
+            <div class="form-row">
+              <label>Notification type</label>
+              <select [(ngModel)]="bulkType" class="select-input full">
+                <option value="Info">ℹ Info</option>
+                <option value="Warning">⚠ Warning</option>
+                <option value="Danger">🚨 Emergency alert</option>
+                <option value="Success">✓ Service update</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label>Title</label>
+              <input type="text" [(ngModel)]="bulkTitle" placeholder="e.g. Scheduled power outage — Zone 3"/>
+            </div>
+
+            <div class="form-row">
+              <label>Message</label>
+              <textarea [(ngModel)]="bulkMessage" rows="5"
+                placeholder="Describe the alert, affected areas, duration and any action residents should take…"></textarea>
+            </div>
+
+            <div class="form-row checkbox-row">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="bulkSms"/>
+                <span>Also send SMS to all registered phone numbers</span>
+              </label>
+            </div>
+
+            <div class="notify-preview" *ngIf="bulkTitle || bulkMessage">
+              <div class="preview-label">Preview</div>
+              <div class="preview-card" [class]="'notify-' + bulkType.toLowerCase()">
+                <div class="preview-title">{{ bulkTitle || 'Notification title' }}</div>
+                <div class="preview-body">{{ bulkMessage || 'Message body…' }}</div>
+              </div>
+            </div>
+
+            <button class="btn-primary full" [disabled]="!bulkTitle || !bulkMessage" (click)="sendBulkNotify()">
+              Send to all {{ stats?.totalResidents || 0 }} residents
+            </button>
+          </div>
+
+          <div class="notify-tips card-panel">
+            <div class="panel-title">Broadcast guidelines</div>
+            <div class="tip-item">
+              <div class="tip-icon emergency">🚨</div>
+              <div><div class="tip-title">Emergency alerts</div><div class="tip-body">Use for immediate safety threats, water outages, or infrastructure failures.</div></div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-icon warning">⚠</div>
+              <div><div class="tip-title">Warnings</div><div class="tip-body">Scheduled maintenance, upcoming payment deadlines, or planned disruptions.</div></div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-icon info">ℹ</div>
+              <div><div class="tip-title">Info updates</div><div class="tip-body">Service improvements, new features, or general municipal announcements.</div></div>
+            </div>
+            <div class="tip-item">
+              <div class="tip-icon sms">📱</div>
+              <div><div class="tip-title">SMS surcharge</div><div class="tip-body">Enabling SMS will send to all {{ stats?.totalResidents || 0 }} registered numbers via Twilio.</div></div>
+            </div>
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <!-- ══ PAYMENT PLANS MODULE ══════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'plans'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Payment Plans</h1>
+            <p class="module-sub">Monitor instalment compliance and flag defaults</p>
+          </div>
+        </div>
+
+        <div class="data-table-wrap card-panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Plan ID</th><th>Account</th><th>Arrears</th><th>Monthly</th>
+                <th>Paid</th><th>Compliance</th><th>Next due</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of paymentPlans">
+                <td class="mono muted">#{{ p.planID }}</td>
+                <td>#{{ p.accountID }}</td>
+                <td class="amount-cell">{{ formatCurrency(p.totalArrears) }}</td>
+                <td class="amount-cell">{{ formatCurrency(p.monthlyInstalment) }}</td>
+                <td class="amount-cell ok-text">{{ formatCurrency(p.paidToDate) }}</td>
+                <td>
+                  <div class="compliance-bar">
+                    <div class="compliance-fill" [style.width.%]="p.complianceRate"></div>
+                  </div>
+                  <span class="compliance-pct">{{ p.complianceRate }}%</span>
+                </td>
+                <td class="muted">{{ formatDate(p.nextPaymentDate) }}</td>
+                <td>
+                  <span class="status-pill sm" [class.blocked]="p.status === 'Defaulted'" [class.ok]="p.status === 'Active'">
+                    {{ p.status }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-outline sm danger" *ngIf="p.status !== 'Defaulted'"
+                          (click)="markDefault(p.planID)">Default</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </ng-container>
+
+      <!-- ══ PROPERTIES MODULE ═════════════════════════════ -->
+      <ng-container *ngIf="activeModule === 'properties'">
+
+        <div class="module-header">
+          <div>
+            <h1 class="module-title">Properties Register</h1>
+            <p class="module-sub">Municipal property database and meter assignments</p>
+          </div>
+        </div>
+
+        <div class="data-table-wrap card-panel">
+          <table class="data-table">
+            <thead>
+              <tr><th>ID</th><th>Address</th><th>Suburb</th><th>Category</th><th>Meter no.</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of properties">
+                <td class="mono muted">#{{ p.propertyID }}</td>
+                <td>{{ p.address }}</td>
+                <td>{{ p.suburb }}</td>
+                <td><span class="method-badge">{{ p.category }}</span></td>
+                <td class="mono">{{ p.meterNumber }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </ng-container>
+
+    </div><!-- /content-area -->
+  </main>
+</div>

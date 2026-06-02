@@ -1,0 +1,675 @@
+// ═══════════════════════════════════════════════════════════════
+// DESIGN SYSTEM VARIABLES
+// ═══════════════════════════════════════════════════════════════
+$font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+// Color Palette
+$bg-global: #f8fafc;
+$surface-card: #ffffff;
+$text-main: #0f172a;
+$text-muted: #64748b;
+$border-color: #e2e8f0;
+
+// Status Accent Colors
+$primary: #0284c7;
+$primary-light: #f0f9ff;
+$danger: #ef4444;
+$danger-light: #fef2f2;
+$success: #10b981;
+$success-light: #f0fdf4;
+$warning: #f59e0b;
+$warning-light: #fffbeb;
+
+// Layout System Metrics
+$radius-lg: 20px;
+$radius-md: 12px;
+$radius-sm: 8px;
+$shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+$transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ══ GLOBAL STRUCTURE ══════════════════════════════════════════
+:host {
+  display: block;
+  font-family: $font-sans;
+  background-color: $bg-global;
+  min-height: 100vh;
+  color: $text-main;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dash {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+// ══ HEADER VIEWPORT AREA ══════════════════════════════════════
+.dash-header {
+  padding: 1.5rem 0;
+  margin-bottom: 1rem;
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .avatar-btn {
+    position: relative;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+
+    .avatar-initials {
+      background: linear-gradient(135deg, $primary, #0369a1);
+      color: #ffffff;
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .avatar-ring {
+      position: absolute;
+      top: -3px; left: -3px; right: -3px; bottom: -3px;
+      border: 2px solid $primary;
+      border-radius: 50%;
+      opacity: 0.3;
+      z-index: 1;
+    }
+  }
+
+  .header-text {
+    flex: 1;
+    .greeting {
+      font-size: 0.875rem;
+      color: $text-muted;
+      line-height: 1.2;
+    }
+    .resident-name {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: $text-main;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .icon-btn {
+      background: $surface-card;
+      border: 1px solid $border-color;
+      color: $text-muted;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: $transition-smooth;
+      box-shadow: $shadow-sm;
+
+      &:hover {
+        color: $danger;
+        background: $danger-light;
+        border-color: rgba($danger, 0.2);
+      }
+    }
+  }
+}
+
+// ══ RUNTIME FEEDBACK BANNERS ══════════════════════════════════
+.loading-bar {
+  width: 100%;
+  height: 4px;
+  background-color: $border-color;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+
+  .loading-inner {
+    width: 40%;
+    height: 100%;
+    background-color: $primary;
+    border-radius: 2px;
+    animation: loading-wave 1s infinite ease-in-out;
+  }
+}
+
+.error-banner {
+  background: $danger-light;
+  border: 1px solid rgba($danger, 0.2);
+  color: #b91c1c;
+  padding: 1rem;
+  border-radius: $radius-md;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// ══ CORE CARD HOOKS SYSTEM ════════════════════════════════════
+.balance-card {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  border-radius: $radius-lg;
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+
+  .balance-card-bg {
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba($primary, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .balance-card-inner {
+    position: relative;
+    z-index: 2;
+  }
+
+  .card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .account-label {
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .account-dot {
+        width: 8px; height: 8px;
+        background-color: $success;
+        border-radius: 50%;
+      }
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      background: rgba($success, 0.15);
+      color: #34d399;
+      border: 1px solid rgba($success, 0.3);
+
+      &.blocked {
+        background: rgba($danger, 0.15);
+        color: #f87171;
+        border: 1px solid rgba($danger, 0.3);
+      }
+    }
+  }
+
+  .balance-section {
+    margin-bottom: 1.5rem;
+
+    .balance-label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .balance-amount {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-top: 0.25rem;
+    }
+  }
+
+  .arrears-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba($danger, 0.1);
+    border: 1px solid rgba($danger, 0.2);
+    padding: 0.75rem 1rem;
+    border-radius: $radius-md;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+
+    .arrears-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #f87171;
+      svg { fill: none; }
+    }
+    .arrears-amount {
+      font-weight: 700;
+      color: #f87171;
+    }
+  }
+
+  .pay-btn {
+    width: 100%;
+    background: $primary;
+    color: #ffffff;
+    border: none;
+    padding: 0.875rem;
+    border-radius: $radius-md;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: $transition-smooth;
+
+    &:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// ══ QUICK CONSUMPTION STATS BLOCK ═════════════════════════════
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  .stat-card {
+    background: $surface-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+    transition: $transition-smooth;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+      border-color: rgba($primary, 0.2);
+
+      .stat-arrow {
+        transform: translateX(2px);
+        color: $primary;
+      }
+    }
+
+    .stat-icon {
+      width: 40px; height: 40px;
+      border-radius: $radius-sm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      &.elec {
+        background: $warning-light;
+        color: $warning;
+      }
+      &.water {
+        background: $primary-light;
+        color: $primary;
+      }
+    }
+
+    .stat-body {
+      flex: 1;
+      .stat-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: $text-main;
+      }
+      .stat-label {
+        font-size: 0.75rem;
+        color: $text-muted;
+      }
+    }
+
+    .stat-arrow {
+      color: #94a3b8;
+      transition: $transition-smooth;
+    }
+  }
+}
+
+// ══ INCLINED BLOCK TARIFF REGION ══════════════════════════════
+.meter-card {
+  background: $surface-card;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  padding: 1.5rem;
+  margin-bottom: 1.75rem;
+  box-shadow: $shadow-sm;
+
+  .meter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+
+    .meter-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .live-pill {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: #f1f5f9;
+      color: $text-muted;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      .live-dot {
+        width: 6px; height: 6px;
+        background-color: $danger;
+        border-radius: 50%;
+        animation: pulse-glow 1.5s infinite;
+      }
+    }
+
+    .meter-kwh {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: $text-main;
+    }
+  }
+
+  .meter-track {
+    height: 12px;
+    background: #f1f5f9;
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    position: relative;
+
+    .meter-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #eab308);
+      border-radius: 9999px;
+      position: relative;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .meter-glow {
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: tracking-shimmer 2s infinite;
+    }
+  }
+
+  .meter-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: $text-muted;
+    margin-bottom: 1.25rem;
+    font-weight: 500;
+
+    .meter-block-badge {
+      color: #b45309;
+      background: #fef3c7;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+  }
+
+  .meter-blocks {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    border-top: 1px dashed $border-color;
+    padding-top: 1rem;
+
+    .block-seg {
+      text-align: center;
+      opacity: 0.4;
+      transition: $transition-smooth;
+
+      &.active {
+        opacity: 1;
+        .block-marker {
+          background-color: $warning;
+          transform: scale(1.2);
+        }
+        .block-name {
+          font-weight: 700;
+          color: $text-main;
+        }
+        .block-rate {
+          font-weight: 600;
+          color: $warning;
+        }
+      }
+
+      .block-marker {
+        width: 6px; height: 6px;
+        background-color: #94a3b8;
+        border-radius: 50%;
+        margin: 0 auto 0.4rem;
+      }
+      .block-name {
+        font-size: 0.75rem;
+        color: $text-muted;
+        margin-bottom: 0.1rem;
+      }
+      .block-rate {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: $text-main;
+      }
+    }
+  }
+}
+
+// ══ GRID ACTION MENU SERVICES SECTION ═════════════════════════
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.85rem;
+  padding: 0 0.25rem;
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $text-main;
+    letter-spacing: -0.01em;
+  }
+
+  .see-all-btn {
+    background: none;
+    border: none;
+    color: $primary;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.25rem;
+
+    &:hover {
+      color: #0369a1;
+    }
+  }
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+
+  .svc-btn {
+    background: $surface-card;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+    transition: $transition-smooth;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: $shadow-md;
+      border-color: rgba($primary, 0.15);
+    }
+
+    .svc-icon-wrap {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .svc-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: $text-main;
+      text-align: center;
+    }
+  }
+}
+
+// ══ TRANSACTIONS STREAM ACTIVITY LIST ═════════════════════════
+.activity-list {
+  background: $surface-card;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  padding: 0.5rem 1.25rem;
+  box-shadow: $shadow-sm;
+
+  .tx-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .tx-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background-color: $text-muted;
+      flex-shrink: 0;
+
+      &.credit {
+        background-color: $success;
+      }
+    }
+
+    .tx-info {
+      flex: 1;
+      .tx-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $text-main;
+        margin-bottom: 0.15rem;
+      }
+      .tx-date {
+        font-size: 0.75rem;
+        color: $text-muted;
+      }
+    }
+
+    .tx-amount {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: $text-main;
+
+      &.credit {
+        color: $success;
+      }
+    }
+  }
+
+  .tx-empty {
+    text-align: center;
+    color: $text-muted;
+    font-size: 0.875rem;
+    padding: 2.5rem 0;
+  }
+}
+
+.bottom-spacer {
+  height: 3rem;
+}
+
+// ══ KEYFRAME ANIMATION LOOPS ══════════════════════════════════
+@keyframes loading-wave {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(150%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes pulse-glow {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba($danger, 0.5);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 5px rgba($danger, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba($danger, 0);
+  }
+}
+
+@keyframes tracking-shimmer {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(150%); }
+}
+
+// ══ MEDIA VIEWPORT QUERIES FOR RESPONSIVENESS ═════════════════
+@media (max-width: 480px) {
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+}

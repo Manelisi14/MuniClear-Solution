@@ -1,0 +1,111 @@
+<!-- Leaflet CSS via CDN — add to index.html <head> if not present:
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script> -->
+
+<div class="page-wrap">
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <div>
+      <div class="page-title">Faults & Complaints</div>
+      <div class="page-subtitle">Log and track service issues</div>
+    </div>
+  </div>
+
+  <div class="error-banner" *ngIf="error">{{ error }}</div>
+  
+  <div class="success-banner" *ngIf="success">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg> 
+    {{ success }}
+  </div>
+
+  <!-- Live map -->
+  <div class="section-label">Live fault map — Richards Bay</div>
+  <div class="map-card">
+    <div id="fault-map"></div>
+    <div class="map-legend">
+      <span class="legend-dot" style="background:#ef4444"></span> Pending
+      <span class="legend-dot" style="background:#f59e0b;margin-left:10px"></span> In progress
+      <span class="legend-dot" style="background:#22c55e;margin-left:10px"></span> Resolved
+      <span style="margin-left:10px;color:var(--color-text-secondary)">· Click map to pin fault location</span>
+    </div>
+  </div>
+
+  <!-- Log a fault -->
+  <div class="section-label">Log a new fault</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" [(ngModel)]="form.category">
+          <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" [(ngModel)]="form.description" rows="3" placeholder="Describe the fault in detail..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Your phone (for SMS updates)</label>
+        <input type="tel" class="form-input" [(ngModel)]="form.phone" placeholder="0821234567"/>
+      </div>
+
+      <!-- Photo Selection Component Block -->
+      <div class="form-group photo-upload-container">
+        <label class="form-label">Photo Attachment (Optional)</label>
+        <div class="file-input-wrapper">
+          <button type="button" class="btn-upload-trigger" (click)="photoInput.click()" style="width: 100%; padding: 10px; background: #f3f4f6; border: 1px dashed #d1d5db; border-radius: 6px; cursor: pointer; color: #4b5563;">
+            📷 {{ previewUrl ? 'Change Photo' : 'Choose File / Take Picture' }}
+          </button>
+          <input #photoInput type="file" accept="image/*" capture="environment" style="display: none" (change)="onPhotoSelected($event)"/>
+        </div>
+        
+        <div class="photo-preview-box" *ngIf="previewUrl" style="margin-top: 10px; position: relative; text-align: center; background: #f9fafb; padding: 6px; border-radius: 6px; border: 1px solid #e5e7eb;">
+          <img [src]="previewUrl" style="max-width: 100%; max-height: 160px; border-radius: 4px; object-fit: contain;" alt="Fault preview" />
+          <button type="button" class="btn-remove-photo" (click)="previewUrl = null; base64ImageString = null; selectedFile = null;" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; line-height: 20px; font-weight: bold;">×</button>
+        </div>
+      </div>
+
+      <div class="location-preview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg> 
+        Pin: {{ form.latitude.toFixed(4) }}, {{ form.longitude.toFixed(4) }} 
+        <span style="color:var(--color-text-secondary);font-size:11px"> (click map to change)</span>
+      </div>
+
+      <button class="btn-primary" (click)="submit()" [disabled]="submitting">
+        {{ submitting ? 'Submitting...' : 'Log fault' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- My fault history -->
+  <div class="section-label">My reported faults</div>
+  <div class="loading-bar" *ngIf="loading"><div class="loading-inner"></div></div>
+  
+  <div class="history-list" *ngIf="myFaults.length > 0">
+    <div class="history-item" *ngFor="let f of myFaults">
+      <div class="history-icon" [style.background]="f.status === 'Resolved' ? '#dcfce7' : f.status === 'InProgress' ? '#fef3c7' : '#fee2e2'">
+        <svg viewBox="0 0 24 24" fill="none" [attr.stroke]="f.status === 'Resolved' ? '#166534' : f.status === 'InProgress' ? '#92400e' : '#991b1b'" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="history-details">
+        <div class="history-name">{{ f.category }} — {{ f.reference }}</div>
+        <div class="history-sub">{{ formatDate(f.createdAt) }} · {{ f.description | slice:0:50 }}...</div>
+      </div>
+      <span class="chip" [ngClass]="statusChip(f.status)" style="font-size:11px;white-space:nowrap">{{ f.status }}</span>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && myFaults.length === 0">No faults reported yet</div>
+</div>

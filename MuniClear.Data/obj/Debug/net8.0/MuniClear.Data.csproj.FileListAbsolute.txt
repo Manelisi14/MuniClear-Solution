@@ -1,0 +1,14 @@
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\bin\Debug\net8.0\MuniClear.Data.deps.json
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\bin\Debug\net8.0\MuniClear.Data.runtimeconfig.json
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\bin\Debug\net8.0\MuniClear.Data.dll
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\bin\Debug\net8.0\MuniClear.Data.pdb
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\MuniClear.Data.csproj.AssemblyReference.cache
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\MuniClear.Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\MuniClear.Data.AssemblyInfoInputs.cache
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\MuniClear.Data.AssemblyInfo.cs
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\MuniClear.Data.csproj.CoreCompileInputs.cache
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\MuniClear.Data.dll
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\refint\MuniClear.Data.dll
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\MuniClear.Data.pdb
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\MuniClear.Data.genruntimeconfig.cache
+C:\Users\M A N E L I S I\Desktop\MuniClear.Data\obj\Debug\net8.0\ref\MuniClear.Data.dll

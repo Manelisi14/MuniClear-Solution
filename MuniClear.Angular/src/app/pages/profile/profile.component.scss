@@ -1,0 +1,60 @@
+@use '../../../styles/page-shared' as *;
+
+.avatar-section {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 1.5rem 1rem 0.5rem;
+}
+.big-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, #0a5c8a, #1a8fc1);
+  color: #fff; font-size: 28px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px; text-transform: uppercase;
+  box-shadow: 0 6px 20px rgba(10,92,138,0.25);
+}
+.avatar-name { font-size: 18px; font-weight: 600; color: #111827; }
+.avatar-acct { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+.logout-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.15); color: #fff;
+  border: 1px solid rgba(255,255,255,0.3); border-radius: 20px;
+  padding: 5px 12px; font-size: 12px; font-weight: 500;
+  cursor: pointer; margin-left: auto;
+  &:hover { background: rgba(255,255,255,0.25); }
+}
+
+.bio-intro {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;
+  background: #e0f2fe; border-radius: 12px; padding: 12px;
+}
+.bio-icon-large {
+  width: 52px; height: 52px; border-radius: 12px;
+  background: #0a5c8a; color: #fff;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.bio-title { font-size: 14px; font-weight: 600; color: #0a5c8a; }
+.bio-sub   { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+.btn-biometric {
+  width: 100%; padding: 12px; background: #f0f9ff;
+  color: #0369a1; border: 1.5px solid #bae6fd;
+  border-radius: 12px; font-size: 14px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 8px; margin-bottom: 1rem;
+  transition: background 0.15s;
+  &:hover { background: #e0f2fe; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.passkey-list { margin-top: 0.5rem; }
+.pk-header { font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+.pk-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid #f3f4f6;
+  &:last-child { border-bottom: none; }
+}
+.pk-info    { flex: 1; }
+.pk-label   { font-size: 13px; font-weight: 500; color: #111827; }
+.pk-date    { font-size: 11px; color: #9ca3af; }
+.pk-delete  { font-size: 11px; color: #dc2626; background: none; border: none; cursor: pointer; padding: 2px 6px; border-radius: 6px; &:hover { background: #fef2f2; } }

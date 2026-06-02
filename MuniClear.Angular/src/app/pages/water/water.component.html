@@ -1,0 +1,97 @@
+<div class="page-wrap">
+
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div>
+      <div class="page-title">Water</div>
+      <div class="page-subtitle">Meter readings & usage</div>
+    </div>
+  </div>
+
+  <div class="loading-bar" *ngIf="loading"><div class="loading-inner"></div></div>
+  <div class="error-banner" *ngIf="error">{{ error }}</div>
+  <div class="success-banner" *ngIf="success">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+    {{ success }}
+  </div>
+
+  <!-- Leak alert -->
+  <div class="error-banner" *ngIf="leakAlert" style="border-left-color:#f59e0b;background:#fffbeb;color:#92400e">
+    ⚠️ Possible leak detected — usage spike above your monthly average. Please check your plumbing.
+  </div>
+
+  <!-- Stats -->
+  <div class="section-label">This month</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Usage</div>
+      <div class="stat-value">{{ monthlyKl }} kL</div>
+      <div class="stat-sub">{{ waterBlocks[currentBlockIndex].label }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Current rate</div>
+      <div class="stat-value" *ngIf="waterBlocks[currentBlockIndex].rateIncl > 0">R{{ waterBlocks[currentBlockIndex].rateIncl }}</div>
+      <div class="stat-value" *ngIf="waterBlocks[currentBlockIndex].rateIncl === 0">Free</div>
+      <div class="stat-sub">per kL incl. VAT</div>
+    </div>
+  </div>
+
+  <!-- Block progress -->
+  <div class="section-label">Rising block tariff</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="ibt-track"><div class="ibt-fill" [style.width.%]="progressPct"></div></div>
+      <div class="ibt-axis"><span>0 kL</span><span>{{ monthlyKl }} kL</span><span>60 kL</span></div>
+      <div class="block-pills">
+        <div class="block-pill" *ngFor="let blk of waterBlocks; let i = index" [class.active]="i === currentBlockIndex">
+          <div class="pill-label">{{ blk.label }}</div>
+          <div class="pill-rate">{{ blk.rateIncl > 0 ? 'R' + blk.rateIncl : 'FREE' }}</div>
+          <div class="pill-range">{{ blk.range }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meter reading submission -->
+  <div class="section-label">Submit meter reading</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="card-row" style="padding: 0 0 0.75rem; border-bottom: 1px solid #f3f4f6;">
+        <span class="row-label">Previous reading</span>
+        <span class="row-value">{{ previousReading }} kL</span>
+      </div>
+      <div style="margin-top: 0.875rem;">
+        <div class="form-group">
+          <label class="form-label">Current meter reading (kL)</label>
+          <input type="number" class="form-input" [(ngModel)]="currentReading"
+            placeholder="Enter reading from meter" min="0" (ngModelChange)="computeBlock()"/>
+        </div>
+        <div class="usage-preview" *ngIf="+currentReading > previousReading">
+          Usage this period: <strong>{{ +currentReading - previousReading }} kL</strong>
+          &nbsp;·&nbsp; Est. charge: <strong>{{ formatCurrency((+currentReading - previousReading) * waterBlocks[currentBlockIndex].rateIncl) }}</strong>
+        </div>
+        <button class="btn-primary" (click)="submitReading()" [disabled]="submitting">
+          {{ submitting ? 'Submitting...' : 'Submit reading' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Usage history -->
+  <div class="section-label">Usage history</div>
+  <div class="history-list">
+    <div class="history-item" *ngFor="let h of usageHistory">
+      <div class="history-icon" style="background:#e0f2fe">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0369a1" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+      </div>
+      <div class="history-details">
+        <div class="history-name">{{ h.month }}</div>
+        <div class="history-sub">{{ h.kl }} kL consumed</div>
+      </div>
+      <div class="history-amount">-{{ formatCurrency(h.amount) }}</div>
+    </div>
+  </div>
+
+</div>

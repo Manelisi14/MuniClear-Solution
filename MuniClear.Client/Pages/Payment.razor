@@ -1,0 +1,83 @@
+﻿@page "/payment/{AccountId:int}/{Amount:decimal}"
+@inject HttpClient Http
+@inject IJSRuntime JS
+@using System.Net.Http.Json
+
+<div class="container text-center mt-5">
+    <div class="card shadow p-5" style="border-radius: 20px; max-width: 500px; margin: auto;">
+        <h2 class="fw-bold">MuniClear Secure Pay</h2>
+        <p class="text-muted">Account ID: @AccountId</p>
+        <h1 class="display-4 fw-bold">R @Amount.ToString("N2")</h1>
+
+        <button class="btn btn-primary btn-lg w-100 mt-4" @onclick="SubmitPayment" disabled="@IsProcessing">
+            @(IsProcessing ? "Connecting..." : "Pay with Stripe")
+        </button>
+
+        @if (!string.IsNullOrEmpty(DebugUrl))
+        {
+            <div class="mt-4 p-3 bg-light border rounded">
+                <p class="small text-success">API Success! Click below if not redirected:</p>
+                <a href="@DebugUrl" target="_blank" class="btn btn-link">Open Stripe Manually</a>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger mt-3 small">
+                <strong>Error:</strong> @ErrorMessage
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int AccountId { get; set; }
+    [Parameter] public decimal Amount { get; set; }
+
+    private bool IsProcessing = false;
+    private string? ErrorMessage;
+    private string? DebugUrl;
+
+    private async Task SubmitPayment()
+    {
+        IsProcessing = true;
+        ErrorMessage = null;
+        DebugUrl = null;
+
+        try
+        {
+            // IMPORTANT: Check your API project's Properties > launchSettings.json
+            // to make sure it matches "api/Payments/..."
+            var request = new { Amount = Amount, PaymentMethod = "Stripe" };
+
+            var response = await Http.PostAsJsonAsync($"api/Payments/create-checkout/{AccountId}", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<StripeResponse>();
+                if (result != null && !string.IsNullOrEmpty(result.Url))
+                {
+                    DebugUrl = result.Url;
+                    // Force the browser to jump to Stripe
+                    await JS.InvokeVoidAsync("window.location.assign", result.Url);
+                }
+            }
+            else
+            {
+                var code = (int)response.StatusCode;
+                var body = await response.Content.ReadAsStringAsync();
+                ErrorMessage = $"API Error {code}: {body}";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Network/Connection Error: {ex.Message}";
+        }
+        finally
+        {
+            IsProcessing = false;
+        }
+    }
+
+    public class StripeResponse { public string? Url { get; set; } }
+}

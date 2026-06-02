@@ -1,0 +1,75 @@
+<div class="page-wrap">
+  
+  <!-- ══ PAGE BRAND HEADER ════════════════════════════════ -->
+  <header class="page-header">
+    <button class="back-btn" (click)="goBack()" aria-label="Navigate back to dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <div class="header-titles">
+      <h1 class="page-title">Refuse Removal</h1>
+      <p class="page-subtitle">Waste collection schedules and service updates</p>
+    </div>
+  </header>
+
+  <!-- 🚚 COLLECTION COUNTDOWN STATUS CARD ═════════════════ -->
+  <section class="collection-status-card" [class.collection-today]="isCollectionDayToday">
+    <div class="truck-icon-frame">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
+        <rect x="1" y="3" width="15" height="13" rx="2"/>
+        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/>
+        <circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    </div>
+    <div class="status-details">
+      <span class="status-alert-title">{{ nextCollectionText }}</span>
+      <p class="status-alert-desc">
+        Your designated collection zone is <strong>{{ schedule.zone }}</strong> ({{ schedule.day }}s). Please place your bin on the kerb side by 07:00 AM.
+      </p>
+    </div>
+  </section>
+
+  <!-- 🏛️ MONTHLY LEVY LEDGER CARD ═════════════════════════ -->
+  <div class="section-label">Billing Profile</div>
+  <section class="card" aria-label="Refuse Billing Statement Ledger">
+    <div class="card-row">
+      <span class="row-label">Monthly Refuse Removal Levy</span>
+      <span class="row-value">{{ formatCurrency(refuseLevy) }}</span>
+    </div>
+    <div class="card-row bins-row">
+      <span class="row-label">Registered Wheelie Bins</span>
+      <span class="row-value">{{ registeredBinsCount }}x Standard 240L Bins</span>
+    </div>
+    <div class="card-row total-highlight-row" style="background: #f8fafc;">
+      <span class="row-label" style="font-weight: 600; color: #111827;">Total Waste Service Charge</span>
+      <span class="row-value" style="color: #0a5c8a; font-size: 16px; font-weight: 700;">{{ formatCurrency(refuseLevy * registeredBinsCount) }}</span>
+    </div>
+  </section>
+
+  <!-- 🚨 COMPLAINTS & RAPID DISPATCH ACTIONS ══════════════ -->
+  <div class="section-label">Report Waste Issues</div>
+  <section class="action-flex-grid">
+    <button type="button" class="action-btn-tile alert-btn" (click)="reportSkippedBin()">
+      <div class="tile-icon-wrapper btn-danger-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6"/>
+        </svg>
+      </div>
+      <span class="tile-label">My Bin Was Skipped</span>
+    </button>
+
+    <button type="button" class="action-btn-tile warning-btn" (click)="reportIllegalDumping()">
+      <div class="tile-icon-wrapper btn-warning-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+      </div>
+      <span class="tile-label">Report Illegal Dumping</span>
+    </button>
+  </section>
+
+  <div class="bottom-spacer-padding" style="height: 3rem;"></div>
+</div>
+

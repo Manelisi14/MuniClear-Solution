@@ -1,0 +1,129 @@
+<div class="page-wrap account-rescue-theme">
+  
+  <!-- ══ PAGE BRAND HEADER ════════════════════════════════ -->
+  <header class="page-header">
+    <button class="back-btn" (click)="goBack()" aria-label="Back to dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <polyline points="15 18 9 12 15 6" />
+      </svg>
+    </button>
+    <div class="header-titles">
+      <h1 class="page-title">Account Rescue</h1>
+      <p class="page-subtitle">Restore services and settle your balance on your terms</p>
+    </div>
+  </header>
+
+  <!-- 🚧 LOADING SHIMMER STATE BOUNDS -->
+  <div class="loading-bar-viewport" *ngIf="uiState.loading$ | async">
+    <div class="loading-bar-tracker-wave"></div>
+  </div>
+
+  <ng-container *ngIf="!(uiState.loading$ | async)">
+
+    <!-- 🟢 SCENARIO A: ACTIVE ARRANGEMENT RUNNING (THE JOURNEY VIEW) -->
+    <div class="rescue-mission-track" *ngIf="activePlan">
+      <div class="glowing-status-badge running">⚡ Rescue Plan Active</div>
+      
+      <div class="progress-dial-zone">
+        <div class="radial-text-center">
+          <span class="percentage-headline">{{ progress | number:'1.0-0' }}%</span>
+          <span class="sub-label">Settled</span>
+        </div>
+        <!-- Modern linear progress visual replacement bar -->
+        <div class="milestone-track-line">
+          <div class="milestone-fill-glow" [style.width.%]="progress"></div>
+        </div>
+      </div>
+
+      <div class="metrics-dashboard-grid">
+        <div class="mini-metric-tile">
+          <span class="tile-title">Paid to date</span>
+          <span class="tile-amount charge-paid">{{ formatCurrency(activePlan.paidToDate) }}</span>
+        </div>
+        <div class="mini-metric-tile">
+          <span class="tile-title">Remaining balance</span>
+          <span class="tile-amount charge-owed">{{ formatCurrency(activePlan.totalArrears - activePlan.paidToDate) }}</span>
+        </div>
+      </div>
+
+      <!-- Streak Rewards Engagement Block -->
+      <div class="reward-streak-banner">
+        <div class="medal-icon">🏆</div>
+        <div class="reward-text">
+          <strong>Keep it up!</strong> Settle your next instalment of <strong>{{ formatCurrency(activePlan.monthlyInstalment) }}</strong> before {{ formatDate(activePlan.nextPaymentDate) }} to lock in your good-standing credit rating.
+        </div>
+      </div>
+    </div>
+
+    <!-- 🔴 SCENARIO B: NO ACTIVE PLAN AND ACCOUNT IS RESTRICTED (THE APPLICATION SLIDER VIEW) -->
+    <div class="rescue-application-view" *ngIf="!activePlan && account">
+      
+      <!-- High Stress Status Box Transformation -->
+      <div class="critical-alert-shield" [class.is-restricted]="account.isBlocked">
+        <div class="shield-icon-wrap">
+          <svg *ngIf="account.isBlocked" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="28" height="28">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <div class="shield-text-meta">
+          <h2 class="shield-headline">{{ account.isBlocked ? 'Services Temporarily Suspended' : 'Account Clearance Stable' }}</h2>
+          <p class="shield-desc">Arrears balance outstanding: <strong>{{ formatCurrency(account.arrearsBalance) }}</strong>. Let's configure a payment plan below to lift restrictions instantly.</p>
+        </div>
+      </div>
+
+      <!-- THE INTERACTIVE SLIDER SELECTION PANEL -->
+      <div class="section-label">Select Your Monthly repayment Term</div>
+      <div class="tactile-term-selector-box">
+        <div class="slider-wrapper-row">
+          <input type="range" min="3" max="12" step="1" [value]="termMonths" 
+                 (input)="onSliderChange($event)" class="premium-freedom-slider" />
+          <div class="slider-ticks-labels">
+            <span [class.active]="termMonths <= 4">Short Term</span>
+            <span [class.active]="termMonths > 4 && termMonths <= 8">Balanced</span>
+            <span [class.active]="termMonths > 8">Extended</span>
+          </div>
+        </div>
+
+        <div class="active-badge-display">
+          <span class="months-counter-headline">{{ termMonths }} Months</span>
+          <span class="interest-rate-tag" [ngClass]="getInterestClass()">{{ getActiveInterestLabel() }}</span>
+        </div>
+      </div>
+
+      <!-- DYNAMIC PREVIEW DATA VISUALIZATION CARD -->
+      <div class="section-label" *ngIf="preview">Your Settle Projection</div>
+      <div class="glowing-preview-card" *ngIf="preview" [ngClass]="getInterestClass()">
+        <div class="preview-inner-row primary-row">
+          <span class="preview-label">Estimated Monthly Payment</span>
+          <span class="preview-value instalment-highlight">{{ formatCurrency(preview.monthlyInstalment) }}</span>
+        </div>
+        <div class="preview-divider-line"></div>
+        <div class="preview-sub-grid">
+          <div class="sub-item">
+            <span class="sub-label">Interest charged</span>
+            <span class="sub-value">{{ preview.interestCharged > 0 ? formatCurrency(preview.interestCharged) : 'R 0.00 (Free)' }}</span>
+          </div>
+          <div class="sub-item">
+            <span class="sub-label">Total repayment amount</span>
+            <span class="sub-value">{{ formatCurrency(preview.totalWithInterest) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEEDBACK NOTIFIER CHIPS -->
+      <div class="alert-banner error" *ngIf="uiState.error$ | async as errorMsg">{{ errorMsg }}</div>
+      <div class="alert-banner success" *ngIf="uiState.success$ | async as successMsg">{{ successMsg }}</div>
+
+      <!-- CONVERT ACTIONS SUBMIT BUTTON -->
+      <button type="button" class="btn-action-rescue-dispatch" 
+              [disabled]="(uiState.submitting$ | async)" (click)="applyPlan()">
+        <span *ngIf="!(uiState.submitting$ | async)">Activate Plan & Restore My Services</span>
+        <div class="button-spinner" *ngIf="uiState.submitting$ | async"></div>
+      </button>
+
+    </div>
+
+  </ng-container>
+  <div class="bottom-spacer-padding" style="height: 3rem;"></div>
+</div>
+

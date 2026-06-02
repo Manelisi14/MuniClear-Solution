@@ -1,0 +1,15 @@
+// water.component.scss
+@use '../../../styles/page-shared' as *;
+
+.ibt-track { background: #e5e7eb; border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 5px; }
+.ibt-fill   { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #0369a1, #38bdf8); transition: width 0.5s ease; }
+.ibt-axis   { display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; margin-bottom: 12px; }
+.block-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.block-pill {
+  background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 6px 4px; text-align: center;
+  &.active { background: #e0f2fe; border-color: #0369a1; }
+}
+.pill-label { font-size: 9px; color: #6b7280; font-weight: 600; margin-bottom: 2px; }
+.pill-rate  { font-size: 11px; font-weight: 700; color: #111827; .block-pill.active & { color: #0369a1; } }
+.pill-range { font-size: 9px; color: #9ca3af; margin-top: 2px; }
+.usage-preview { font-size: 13px; color: #374151; background: #f0f9ff; border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; }

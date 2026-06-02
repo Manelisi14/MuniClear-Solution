@@ -1,0 +1,80 @@
+<div class="page-wrap">
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div>
+      <div class="page-title">Pay Bill</div>
+      <div class="page-subtitle">Municipal account payment via Stripe</div>
+    </div>
+  </div>
+
+  <div class="loading-bar" *ngIf="loading"><div class="loading-inner"></div></div>
+  
+  <div class="success-banner" *ngIf="success">{{ success }}</div>
+  <div class="error-banner" *ngIf="error">{{ error }}</div>
+
+  <!-- Account summary -->
+  <div class="section-label">Your account</div>
+  <div class="card" *ngIf="account">
+    <div class="card-row"><span class="row-label">Account</span><span class="row-value">{{ account.accountNumber }}</span></div>
+    <div class="card-row">
+      <span class="row-label">Balance</span>
+      <span class="row-value" style="color:#0a5c8a;font-weight:700">{{ formatCurrency(account.currentBalance) }}</span>
+    </div>
+    <div class="card-row">
+      <span class="row-label">Status</span>
+      <span class="chip" [ngClass]="account.isBlocked ? 'chip-danger' : 'chip-success'">
+        {{ account.isBlocked ? '🔒 Blocked' : '✅ Active' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="section-label">Select payment type</div>
+  <div class="pay-tabs">
+    <button class="pay-tab" [class.active]="activeTab === 'current'" (click)="setTab('current')">Current</button>
+    <button class="pay-tab" [class.active]="activeTab === 'arrears'" (click)="setTab('arrears')">Arrears</button>
+    <button class="pay-tab" [class.active]="activeTab === 'general'" (click)="setTab('general')">General</button>
+  </div>
+
+  <!-- Dynamic Tab Content -->
+  <div class="card">
+    <div class="card-body">
+      <!-- Arrears Warning -->
+      <div class="info-banner" *ngIf="activeTab === 'arrears'">
+        Paying arrears restores service. 100% goes to clearing the debt.
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Amount to pay (R)</label>
+        <input type="number" class="form-input" [(ngModel)]="amount" placeholder="0.00" min="10"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Phone for SMS Receipt</label>
+        <input type="tel" class="form-input" [(ngModel)]="phoneNumber" placeholder="0821234567"/>
+      </div>
+
+      <button class="btn-primary" (click)="pay()" [disabled]="submitting || !amount">
+        {{ submitting ? 'Redirecting to Stripe...' : 'Pay ' + (amount ? formatCurrency(+amount) : '') + ' →' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent payments -->
+  <div class="section-label">Recent History</div>
+  <div class="history-list" *ngIf="paymentHistory.length > 0">
+    <div class="history-item" *ngFor="let p of paymentHistory">
+      <div class="history-details">
+        <div class="history-name">{{ p.paymentMethod }}</div>
+        <div class="history-sub">{{ formatDate(p.createdAt) }}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="history-amount">+{{ formatCurrency(p.amount) }}</div>
+        <button class="download-btn" (click)="downloadInvoice(p.paymentID)">Invoice</button>
+      </div>
+    </div>
+  </div>
+</div>
+

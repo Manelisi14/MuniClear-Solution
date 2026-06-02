@@ -1,0 +1,87 @@
+﻿@page "/admin"
+@using System.Net.Http.Json
+@inject HttpClient Http
+
+<div class="container mt-4">
+    <div class="card p-4 shadow-sm">
+        <h2 class="mb-4 text-primary">Admin: Unblock Requests</h2>
+
+        @if (requests == null)
+        {
+            <div class="spinner-border text-primary" role="status"></div>
+        }
+        else if (!requests.Any())
+        {
+            <div class="alert alert-info">No pending requests found.</div>
+        }
+        else
+        {
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Acc #</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var req in requests)
+                    {
+                        <tr>
+                            <td>Account @req.accountID</td>
+                            <td><span class="badge bg-warning text-dark">Pending</span></td>
+                            <td>
+                                <button class="btn btn-success btn-sm px-3" @onclick="() => Approve(req.accountID)">
+                                    Approve & Restore Power
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private List<UnblockRequestDTO>? requests;
+
+    protected override async Task OnInitializedAsync()
+    {
+        requests = await Http.GetFromJsonAsync<List<UnblockRequestDTO>>("api/UnblockRequests");
+    }
+
+    private async Task Approve(int accId)
+    {
+        // 1. Get the Account
+        var acc = await Http.GetFromJsonAsync<AccountDTO>($"api/Accounts/{accId}");
+
+        if (acc != null)
+        {
+            // 2. Flip isBlocked to false
+            acc.isBlocked = false;
+            await Http.PutAsJsonAsync($"api/Accounts/{accId}", acc);
+
+            // 3. Refresh list
+            requests = await Http.GetFromJsonAsync<List<UnblockRequestDTO>>("api/UnblockRequests");
+            StateHasChanged();
+        }
+    }
+
+    public class UnblockRequestDTO
+    {
+        public int requestID { get; set; }
+        public int accountID { get; set; }
+    }
+
+    public class AccountDTO
+    {
+        public int accountID { get; set; }
+        public int propertyID { get; set; }
+        public string accountNumber { get; set; } = "";
+        public decimal arrearsBalance { get; set; }
+        public decimal currentBalance { get; set; }
+        public bool isBlocked { get; set; }
+    }
+}
+

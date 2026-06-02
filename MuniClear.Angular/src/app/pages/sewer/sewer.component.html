@@ -1,0 +1,107 @@
+<div class="page-wrap">
+  
+  <!-- ══ PAGE BRAND HEADER ════════════════════════════════ -->
+  <header class="page-header">
+    <button class="back-btn" (click)="goBack()" aria-label="Navigate back to dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <div class="header-titles">
+      <h1 class="page-title">Sewer & Sanitation</h1>
+      <p class="page-subtitle">Monthly wastewater and effluent charges</p>
+    </div>
+  </header>
+
+  <!-- Asynchronous Error Message Pipeline Banner -->
+  <div class="alert-banner error" *ngIf="uiState.error$ | async as errorMessage" role="alert">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Formula Policy Directive Notice Banner -->
+  <div class="info-banner" style="margin-top: 0.75rem;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="flex-shrink: 0;">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+    <span>Sewer charges are calculated at <strong>65% of your water consumption charge</strong>, plus a fixed sanitation infrastructure levy.</span>
+  </div>
+
+  <!-- Asynchronous Loading Shimmer Bar -->
+  <div class="loading-bar-viewport" *ngIf="uiState.loading$ | async">
+    <div class="loading-bar-tracker-wave"></div>
+  </div>
+
+  <ng-container *ngIf="!(uiState.loading$ | async)">
+    
+    <!-- ══ THIS MONTH'S CHARGES LEDGER CARD ═════════════════ -->
+    <div class="section-label">This month's charges</div>
+    <section class="card" aria-label="Wastewater Account Breakdown Ledger">
+      <div class="card-row">
+        <span class="row-label">Water consumption charge</span>
+        <span class="row-value">{{ formatCurrency(monthlyWaterCharge) }}</span>
+      </div>
+      
+      <div class="card-row">
+        <span class="row-label">Sewer effluent discharge (65% of water)</span>
+        <span class="row-value">{{ formatCurrency(sewerCharge) }}</span>
+      </div>
+      
+      <div class="card-row">
+        <span class="row-label">Fixed sanitation levy</span>
+        <span class="row-value">{{ formatCurrency(fixedSewerLevy) }}</span>
+      </div>
+      
+      <div class="card-row total-highlight-row" style="background: #f8fafc;">
+        <span class="row-label" style="font-weight: 600; color: #111827;">Total sewer charge</span>
+        <span class="row-value" style="color: #0a5c8a; font-size: 16px; font-weight: 700;">{{ formatCurrency(totalSewer) }}</span>
+      </div>
+    </section>
+
+    <!-- ══ ANALYTIC FACTOR TILES ════════════════════════════ -->
+    <section class="stat-grid" aria-label="Sanitation Formula Metrics Overview">
+      <div class="stat-card">
+        <span class="stat-label">Sewer Rate Factor</span>
+        <div class="stat-value">65%</div>
+        <span class="stat-sub">of inbound water spend</span>
+      </div>
+      
+      <div class="stat-card">
+        <span class="stat-label">Fixed Infrastructure Levy</span>
+        <div class="stat-value" style="font-size: 18px;">R {{ fixedSewerLevy | number:'1.2-2' }}</div>
+        <span class="stat-sub">inclusive of 15% VAT</span>
+      </div>
+    </section>
+
+    <!-- ══ HISTORICAL TRANSCRIPT HISTORY LOG ════════════════ -->
+    <div class="section-label">Retrospective Statements History</div>
+    <section class="history-list" aria-label="Sanitation Billing History Logs">
+      <article class="history-item" *ngFor="let h of history; trackBy: trackByMonth">
+        <div class="history-icon" style="background: #ede9fe;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3730a3" stroke-width="2">
+            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+          </svg>
+        </div>
+        
+        <div class="history-details">
+          <h3 class="history-name" style="margin: 0;">{{ h.month }}</h3>
+          <p class="history-sub" style="margin: 0.15rem 0 0 0;">Water consumption basis: {{ formatCurrency(h.waterCharge) }}</p>
+        </div>
+        
+        <div class="history-amount" style="font-weight: 700; color: #b91c1c;">
+          -{{ formatCurrency(h.sewerCharge) }}
+        </div>
+      </article>
+      
+      <!-- Safe Null Collection Fallback State Block -->
+      <div class="empty-fallback-state" *ngIf="!history || history.length === 0">
+        <p>No historical sanitation payment statement balances indexed yet.</p>
+      </div>
+    </section>
+
+  </ng-container>
+
+  <div class="bottom-spacer-padding" style="height: 3rem;"></div>
+</div>
