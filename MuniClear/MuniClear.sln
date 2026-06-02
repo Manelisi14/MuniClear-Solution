@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34018.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MuniClear", "MuniClear.csproj", "{2A49187F-EA57-4422-AA97-807D65EF2BE8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MuniClear.Data", "..\MuniClear.Data\MuniClear.Data.csproj", "{E3DAAA40-9F92-4A0D-96A7-316CEAE7660D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2A49187F-EA57-4422-AA97-807D65EF2BE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A49187F-EA57-4422-AA97-807D65EF2BE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A49187F-EA57-4422-AA97-807D65EF2BE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A49187F-EA57-4422-AA97-807D65EF2BE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3DAAA40-9F92-4A0D-96A7-316CEAE7660D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3DAAA40-9F92-4A0D-96A7-316CEAE7660D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3DAAA40-9F92-4A0D-96A7-316CEAE7660D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3DAAA40-9F92-4A0D-96A7-316CEAE7660D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E5675AF1-0782-434E-930F-F4C62CBFDDF2}
+	EndGlobalSection
+EndGlobal

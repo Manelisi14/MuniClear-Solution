@@ -1,0 +1,65 @@
+@model IEnumerable<MuniClear.Data.Models.WaterReading>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Reading)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Usage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MeterNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LeakAlert)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Account)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Reading)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Usage)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MeterNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LeakAlert)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Account.AccountNumber)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ReadingID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ReadingID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ReadingID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
